@@ -3,13 +3,17 @@ name: Wails build
 on:
   push:
     tags:
-    # Match any new tag
       - '*-release'
       - '*-dev'
       - '*-pre'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to build (e.g., v1.0.0-release, v1.0.0-dev, v1.0.0-pre)'
+        required: false
+        default: ''
 
 env:
-  # Necessary for most environments as build failure can occur due to OOM issues
   NODE_OPTIONS: "--max-old-space-size=4096"
   OFFICIAL_STATEMENT: ${{ vars.OFFICIAL_STATEMENT }}
   BUILD_KEY: ${{ vars.BUILD_KEY }}
@@ -20,29 +24,32 @@ permissions:
 jobs:
   build:
     strategy:
-    # Failure in one platform build won't impact the others
       fail-fast: false
       matrix:
         build:
           - name: 'go-stock-windows-amd64.exe'
             platform:  'windows/amd64'
             os: 'windows-latest'
-          - name: 'go-stock-darwin-universal'
-            platform: 'darwin/universal'
-            os: 'macos-latest'
-          - name: 'go-stock-darwin-intel'
-            platform: 'darwin'
-            os: 'macos-latest'
-          - name: 'go-stock-darwin-arm64'
-            platform: 'darwin/arm64'
-            os: 'macos-latest'
 
     runs-on: ${{ matrix.build.os }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           submodules: recursive
+          fetch-depth: 0
+
+      - name: Determine tag
+        id: determine_tag
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.tag }}" ]; then
+            TAG="${{ github.event.inputs.tag }}"
+          else
+            TAG="${{ github.ref_name }}"
+          fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "Building tag: $TAG"
 
       - name: Get commit message
         id: get_commit_message
@@ -53,7 +60,7 @@ jobs:
         id: channel
         shell: bash
         run: |
-          TAG="${{ github.ref_name }}"
+          TAG="${{ steps.determine_tag.outputs.tag }}"
           if [[ "$TAG" == *-release ]]; then
             echo "channel=release" >> $GITHUB_OUTPUT
             echo "prerelease=false" >> $GITHUB_OUTPUT
@@ -66,6 +73,10 @@ jobs:
             echo "channel=dev" >> $GITHUB_OUTPUT
             echo "prerelease=true" >> $GITHUB_OUTPUT
             echo "channel_label=Dev（开发版）" >> $GITHUB_OUTPUT
+          else
+            echo "channel=release" >> $GITHUB_OUTPUT
+            echo "prerelease=false" >> $GITHUB_OUTPUT
+            echo "channel_label=Release（稳定版）" >> $GITHUB_OUTPUT
           fi
 
       - name: Build wails x go-stock
@@ -76,11 +87,22 @@ jobs:
           build-platform: ${{ matrix.build.platform }}
           package: true
           go-version: '1.26'
-          build-tags: ${{ github.ref_name }}
+          build-tags: ${{ steps.determine_tag.outputs.tag }}
           build-commit-message: ${{ steps.get_commit_message.outputs.commit_message }}
           build-statement: ${{ env.OFFICIAL_STATEMENT }}
           build-key: ${{ env.BUILD_KEY }}
           node-version: '20.19.3'
+
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.determine_tag.outputs.tag }}
+          name: ${{ steps.determine_tag.outputs.tag }}
+          prerelease: ${{ steps.channel.outputs.prerelease == 'true' }}
+          files: |
+            build/bin/${{ matrix.build.name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update release for channel
         if: steps.channel.outputs.channel != 'release'
@@ -88,7 +110,7 @@ jobs:
         with:
           script: |
             const { owner, repo } = context.repo;
-            const tag = '${{ github.ref_name }}';
+            const tag = '${{ steps.determine_tag.outputs.tag }}';
             const channel = '${{ steps.channel.outputs.channel }}';
             const channelLabel = '${{ steps.channel.outputs.channel_label }}';
             const prerelease = '${{ steps.channel.outputs.prerelease }}' === 'true';

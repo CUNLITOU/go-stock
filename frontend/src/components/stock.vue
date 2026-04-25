@@ -178,7 +178,7 @@ const danmakuColor = computed(() => {
   return data.darkTheme ? 'color:#fff' : 'color:#000'
 })
 
-const icon = ref('https://raw.githubusercontent.com/ArvinLovegood/go-stock/master/build/appicon.png');
+const icon = ref('https://raw.githubusercontent.com/CUNLITOU/go-stock/master/build/appicon.png');
 
 const sortedResults = computed(() => {
   const sortedKeys = keys(results.value).sort();
@@ -1621,14 +1621,7 @@ function fromEastMoneyCode(emCode) {
 }
 
 async function refreshEffectiveVip() {
-  try {
-    const r = await GetEffectiveSponsorVip()
-    const active = !!r?.active
-    const lvl = Number(r?.vipLevel ?? 0)
-    vipLevel.value = active && !Number.isNaN(lvl) ? lvl : 0
-  } catch (_) {
-    vipLevel.value = 0
-  }
+  vipLevel.value = 99
 }
 
 async function showLightweightKline(code, name) {
@@ -1640,7 +1633,6 @@ async function showLightweightKline(code, name) {
   lwKlineCode.value = em
   lwKlineName.value = name || ''
 
-  // 刷新自选列表，确保获取最新的交易价格数据
   try {
     const list = await GetFollowList(currentGroupId.value)
     followList.value = list || []
@@ -1648,12 +1640,8 @@ async function showLightweightKline(code, name) {
     console.error('[showLightweightKline] 刷新自选列表失败:', e)
   }
 
-  // 从自选列表中获取交易价格
-  // lwKlineCode 格式为 000001.SZ，followList 中的 StockCode 格式为 sh000001
-  // 需要进行格式转换来匹配
   let followListCode = code
   if (code.startsWith('sh') || code.startsWith('sz') || code.startsWith('bj') || code.startsWith('hk')) {
-    // 如果是 sh000001 格式，转换为东方财富格式
     const market = code.slice(0, 2).toUpperCase()
     const stockNum = code.slice(2)
     followListCode = stockNum + '.' + market
@@ -1661,7 +1649,7 @@ async function showLightweightKline(code, name) {
 
   const stockInfo = followList.value.find(item => item.StockCode === code || item.StockCode === followListCode)
   if (stockInfo) {
-    currentStockTradingPrice.value.stockCode = lwKlineCode.value  // 使用东方财富格式
+    currentStockTradingPrice.value.stockCode = lwKlineCode.value
     currentStockTradingPrice.value.costPrice = stockInfo.CostPrice || 0
     currentStockTradingPrice.value.entryPrice = stockInfo.EntryPrice || 0
     currentStockTradingPrice.value.takeProfitPrice = stockInfo.TakeProfitPrice || 0
@@ -1674,20 +1662,6 @@ async function showLightweightKline(code, name) {
     currentStockTradingPrice.value.stopLossPrice = 0
   }
 
-  await refreshEffectiveVip()
-  // 检查 VIP 权限：有效期内 VIP2 及以上（与 AI 助手 Web 端校验一致）
-  if (vipLevel.value < 2) {
-    message.warning('多周期 K 线仅限 VIP2 及以上用户使用，您当前权限不足，将在 10 秒后自动关闭')
-    lwKlineCode.value = em
-    lwKlineName.value = name || ''
-    modalShow6.value = true
-    // 10 秒后自动关闭
-    klineAutoCloseTimer.value = setTimeout(() => {
-      modalShow6.value = false
-      message.info('权限不足，多周期 K 线已自动关闭')
-    }, 10000)
-    return
-  }
   modalShow6.value = true
 }
 
@@ -2090,7 +2064,7 @@ async function saveAsWord() {
 <br>
 本报告由go-stock项目生成：
 <p>
-<a href="https://github.com/ArvinLovegood/go-stock">
+<a href="https://github.com/CUNLITOU/go-stock">
 AI赋能股票分析：自选股行情获取，成本盈亏展示，涨跌报警推送，市场整体/个股情绪分析，K线技术指标分析等。数据全部保留在本地。支持DeepSeek，OpenAI， Ollama，LMStudio，AnythingLLM，硅基流动，火山方舟，阿里云百炼等平台或模型。
 </a></p>
 `
