@@ -259,9 +259,6 @@ const optionsReactive= reactive([
  ])
 
 function loadStocks(page, pageSize) {
-  if((vipLevel.value===""|| Number(vipLevel.value) <=0)){
-    handleReset()
-  }
   if (!loadingRef.value) {
     loadingRef.value = true
     GetAllStocks(page, pageSize, paginationReactive.keyword, technicalIndicatorReactive).then((res) => {
@@ -286,11 +283,6 @@ function loadStocks(page, pageSize) {
   }
 }
 function handleCheckedChange(checked) {
-
-  if(checked&&(vipLevel.value===""|| Number(vipLevel.value) <=0)){
-    handleReset()
-    message.warning('未开通VIP或者已经过期，无法使用技术面筛选')
-  }
 }
 function handlePageChange(currentPage) {
   loadStocks(currentPage, paginationReactive.pageSize)
