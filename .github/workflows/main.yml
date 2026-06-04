@@ -40,7 +40,7 @@ jobs:
     runs-on: ${{ matrix.build.os }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           submodules: recursive
 
@@ -91,6 +91,30 @@ jobs:
           build-key: ${{ env.BUILD_KEY }}
           node-version: '22.22.2'
           wails-version: 'v2.11.0'
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.channel.outputs.tag }}
+          name: ${{ steps.channel.outputs.tag }}
+          prerelease: ${{ steps.channel.outputs.prerelease }}
+          files: |
+            build/bin/${{ matrix.build.name }}
+          body: |
+            ## ${{ steps.channel.outputs.channel_label }}
+            
+            ### 更新说明
+            ${{ steps.get_commit_message.outputs.commit_message }}
+            
+            ### 下载说明
+            - **windows-amd64**: 适用于 64 位 Windows 系统
+            - **windows-arm64**: 适用于 ARM64 Windows 系统
+            
+            ---
+            
+            > 由 GitHub Actions 自动构建发布
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update release for channel
         if: steps.channel.outputs.channel != 'release'
