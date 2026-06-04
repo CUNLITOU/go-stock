@@ -407,12 +407,8 @@ async function loadComments(promptId) {
   }
 }
 
+// 已解除登录限制
 async function handleLike(prompt) {
-  if (!isLoggedIn.value) {
-    message.warning('请先登录')
-    loginModal.show = true
-    return
-  }
   try {
     const data = await apiPost(`/prompts/${prompt.id}/like`)
     prompt.isLiked = data.isLiked
@@ -426,12 +422,8 @@ async function handleLike(prompt) {
   }
 }
 
+// 已解除登录限制
 async function handleFavorite(prompt) {
-  if (!isLoggedIn.value) {
-    message.warning('请先登录')
-    loginModal.show = true
-    return
-  }
   try {
     const data = await apiPost(`/prompts/${prompt.id}/favorite`)
     prompt.isFavorited = data.isFavorited
@@ -504,12 +496,8 @@ async function addPromptToTemplate(prompt) {
   }
 }
 
+// 已解除登录限制
 async function submitComment() {
-  if (!isLoggedIn.value) {
-    message.warning('请先登录')
-    loginModal.show = true
-    return
-  }
   if (!detailModal.newComment.trim()) {
     message.warning('请输入评论内容')
     return
@@ -609,12 +597,8 @@ function handleDeletePrompt(prompt) {
   })
 }
 
+// 已解除登录限制
 async function showCreateModal() {
-  if (!isLoggedIn.value) {
-    message.warning('请先登录')
-    loginModal.show = true
-    return
-  }
   createModal.title = ''
   createModal.content = ''
   createModal.description = ''
