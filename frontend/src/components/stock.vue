@@ -180,7 +180,7 @@ const danmakuColor = computed(() => {
   return data.darkTheme ? 'color:#fff' : 'color:#000'
 })
 
-const icon = ref('https://raw.githubusercontent.com/ArvinLovegood/go-stock/master/build/appicon.png');
+const icon = ref('https://raw.githubusercontent.com/CUNLITOU/go-stock/master/build/appicon.png');
 
 const sortedResults = computed(() => {
   const sortedKeys = keys(results.value).sort();
@@ -1645,17 +1645,12 @@ function fromEastMoneyCode(emCode) {
   return c.toLowerCase()
 }
 
+// 已解除 VIP 限制，始终返回 VIP2 等级
 async function refreshEffectiveVip() {
-  try {
-    const r = await GetEffectiveSponsorVip()
-    const active = !!r?.active
-    const lvl = Number(r?.vipLevel ?? 0)
-    vipLevel.value = active && !Number.isNaN(lvl) ? lvl : 0
-  } catch (_) {
-    vipLevel.value = 0
-  }
+  vipLevel.value = 2
 }
 
+// 已解除 VIP 限制，直接打开 K 线图
 async function showLightweightKline(code, name) {
   const em = toEastMoneyCode(code)
   if (!em) {
@@ -1699,20 +1694,6 @@ async function showLightweightKline(code, name) {
     currentStockTradingPrice.value.stopLossPrice = 0
   }
 
-  await refreshEffectiveVip()
-  // 检查 VIP 权限：有效期内 VIP2 及以上（与 AI 助手 Web 端校验一致）
-  if (vipLevel.value < 2) {
-    message.warning('多周期 K 线仅限 VIP2 及以上用户使用，您当前权限不足，将在 10 秒后自动关闭')
-    lwKlineCode.value = em
-    lwKlineName.value = name || ''
-    modalShow6.value = true
-    // 10 秒后自动关闭
-    klineAutoCloseTimer.value = setTimeout(() => {
-      modalShow6.value = false
-      message.info('权限不足，多周期 K 线已自动关闭')
-    }, 10000)
-    return
-  }
   modalShow6.value = true
 }
 
@@ -2112,7 +2093,7 @@ async function saveAsWord() {
 <br>
 本报告由go-stock项目生成：
 <p>
-<a href="https://github.com/ArvinLovegood/go-stock">
+<a href="https://github.com/CUNLITOU/go-stock">
 AI赋能股票分析：自选股行情获取，成本盈亏展示，涨跌报警推送，市场整体/个股情绪分析，K线技术指标分析等。数据全部保留在本地。支持DeepSeek，OpenAI， Ollama，LMStudio，AnythingLLM，硅基流动，火山方舟，阿里云百炼等平台或模型。
 </a></p>
 `

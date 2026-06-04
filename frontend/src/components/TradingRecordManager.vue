@@ -230,30 +230,19 @@ function toEastMoneyCode(code) {
   return c.toLowerCase()
 }
 
+// 已解除 VIP 限制，始终返回 VIP2 等级
 async function refreshEffectiveVip() {
-  try {
-    const r = await GetEffectiveSponsorVip()
-    const active = !!r?.active
-    const lvl = Number(r?.vipLevel ?? 0)
-    vipLevel.value = active && !Number.isNaN(lvl) ? lvl : 0
-  } catch (_) {
-    vipLevel.value = 0
-  }
+  vipLevel.value = 2
 }
 
+// 已解除 VIP 限制，直接打开 K 线图
 function openKlineChart(row) {
-  refreshEffectiveVip().then(() => {
-    if (vipLevel.value < 2) {
-      message.warning('查看K线仅限VIP2及以上用户使用')
-      return
-    }
-    klineStockCode.value = toEastMoneyCode(row.StockCode)
-    klineStockName.value = row.StockName || ''
-    showKlineModal.value = true
-    longStopLossPrice.value = row.StopLossPrice || 0
-    longTakeProfitPrice.value = row.TakeProfitPrice || 0
-    costPrice.value = row.Price || 0
-  })
+  klineStockCode.value = toEastMoneyCode(row.StockCode)
+  klineStockName.value = row.StockName || ''
+  showKlineModal.value = true
+  longStopLossPrice.value = row.StopLossPrice || 0
+  longTakeProfitPrice.value = row.TakeProfitPrice || 0
+  costPrice.value = row.Price || 0
 }
 
 

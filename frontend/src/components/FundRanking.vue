@@ -357,12 +357,10 @@ GetConfig().then(result => {
   if (result.darkTheme) darkTheme.value = true
 })
 
+// 已解除 VIP 限制，始终返回 VIP2 等级
 function refreshEffectiveVip() {
-  return GetEffectiveSponsorVip().then(res => {
-    if (res) {
-      vipLevel.value = res.vipLevel || 0
-    }
-  }).catch(() => {})
+  vipLevel.value = 2
+  return Promise.resolve()
 }
 
 function toEastMoneyCode(stockCode, market) {
@@ -374,24 +372,12 @@ function toEastMoneyCode(stockCode, market) {
   return stockCode + '.US'
 }
 
+// 已解除 VIP 限制，直接打开 K 线图
 function showStockKline(stockCode, stockName, market) {
-  refreshEffectiveVip().then(() => {
-    if (vipLevel.value < 2) {
-      message.warning('K线图仅限 VIP2 及以上用户使用，您当前权限不足，将在 10 秒后自动关闭')
-      klineStockCode.value = toEastMoneyCode(stockCode, market)
-      klineStockName.value = stockName
-      klineModalShow.value = true
-      if (klineAutoCloseTimer) clearTimeout(klineAutoCloseTimer)
-      klineAutoCloseTimer = setTimeout(() => {
-        klineModalShow.value = false
-      }, 10000)
-      return
-    }
-    klineStockCode.value = toEastMoneyCode(stockCode, market)
-    klineStockName.value = stockName
-    klineModalShow.value = true
-    if (klineAutoCloseTimer) clearTimeout(klineAutoCloseTimer)
-  })
+  klineStockCode.value = toEastMoneyCode(stockCode, market)
+  klineStockName.value = stockName
+  klineModalShow.value = true
+  if (klineAutoCloseTimer) clearTimeout(klineAutoCloseTimer)
 }
 </script>
 

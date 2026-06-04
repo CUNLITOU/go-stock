@@ -155,12 +155,10 @@ function Search() {
   })
 }
 
+// 已解除 VIP 限制，始终返回 VIP2 等级
 function refreshEffectiveVip() {
-  return GetEffectiveSponsorVip().then(res => {
-    if (res) {
-      vipLevel.value = res.vipLevel || 0
-    }
-  }).catch(() => {})
+  vipLevel.value = 2
+  return Promise.resolve()
 }
 
 function toEastMoneyCode(stockCode, marketShortName) {
@@ -172,6 +170,7 @@ function toEastMoneyCode(stockCode, marketShortName) {
   return stockCode + '.SZ'
 }
 
+// 已解除 VIP 限制，直接打开 K 线图
 function showStockKline(row) {
   const stockCode = row.SECURITY_CODE
   const stockName = row.SECURITY_SHORT_NAME
@@ -180,21 +179,10 @@ function showStockKline(row) {
     message.warning('当前代码暂不支持K线图')
     return
   }
-  refreshEffectiveVip().then(() => {
-    klineStockCode.value = em
-    klineStockName.value = stockName || ''
-    if (vipLevel.value < 2) {
-      message.warning('K线图仅限 VIP2 及以上用户使用，您当前权限不足，将在 10 秒后自动关闭')
-      klineModalShow.value = true
-      if (klineAutoCloseTimer) clearTimeout(klineAutoCloseTimer)
-      klineAutoCloseTimer = setTimeout(() => {
-        klineModalShow.value = false
-      }, 10000)
-      return
-    }
-    klineModalShow.value = true
-    if (klineAutoCloseTimer) clearTimeout(klineAutoCloseTimer)
-  })
+  klineStockCode.value = em
+  klineStockName.value = stockName || ''
+  klineModalShow.value = true
+  if (klineAutoCloseTimer) clearTimeout(klineAutoCloseTimer)
 }
 
 function handleFollow(row) {

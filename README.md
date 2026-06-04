@@ -1,10 +1,10 @@
 # go-stock : 基于大语言模型的AI赋能股票分析工具
 ## ![go-stock](./build/appicon.png)
-![GitHub Release](https://img.shields.io/github/v/release/ArvinLovegood/go-stock?link=https%3A%2F%2Fgithub.com%2FArvinLovegood%2Fgo-stock%2Freleases&link=https%3A%2F%2Fgithub.com%2FArvinLovegood%2Fgo-stock%2Freleases)
-[![GitHub Repo stars](https://img.shields.io/github/stars/ArvinLovegood/go-stock?link=https%3A%2F%2Fgithub.com%2FArvinLovegood%2Fgo-stock)](https://github.com/ArvinLovegood/go-stock)
+![GitHub Release](https://img.shields.io/github/v/release/CUNLITOU/go-stock?link=https%3A%2F%2Fgithub.com%2FArvinLovegood%2Fgo-stock%2Freleases&link=https%3A%2F%2Fgithub.com%2FArvinLovegood%2Fgo-stock%2Freleases)
+[![GitHub Repo stars](https://img.shields.io/github/stars/CUNLITOU/go-stock?link=https%3A%2F%2Fgithub.com%2FArvinLovegood%2Fgo-stock)](https://github.com/CUNLITOU/go-stock)
 [![star](https://gitee.com/arvinlovegood_admin/go-stock/badge/star.svg?theme=dark)](https://gitee.com/arvinlovegood_admin/go-stock)
 
-[//]: # ([![star]&#40;https://gitcode.com/ArvinLovegood/go-stock/star/badge.svg&#41;]&#40;https://gitcode.com/ArvinLovegood/go-stock&#41;)
+[//]: # ([![star]&#40;https://gitcode.com/CUNLITOU/go-stock/star/badge.svg&#41;]&#40;https://gitcode.com/CUNLITOU/go-stock&#41;)
 
 ## 💖 赞助商 (Sponsors)
 ### 🌟[Anspire开放平台](https://open.anspire.cn/?share_code=OMSTE9LW)，一Key同时启用全球热门大模型和联网搜索，无需科学上网，含免费额度
@@ -53,11 +53,11 @@
 [go-stock使用手册](docs/go-stock使用手册.md)
 
 ### 📦 立即体验
-[//]: # (- 安装版：[go-stock-amd64-installer.exe]&#40;https://github.com/ArvinLovegood/go-stock/releases&#41;)
-- 绿色版：[go-stock-windows-amd64.exe](https://github.com/ArvinLovegood/go-stock/releases)
-- MACOS绿色版：[go-stock-darwin-universal](https://github.com/ArvinLovegood/go-stock/releases)
+[//]: # (- 安装版：[go-stock-amd64-installer.exe]&#40;https://github.com/CUNLITOU/go-stock/releases&#41;)
+- 绿色版：[go-stock-windows-amd64.exe](https://github.com/CUNLITOU/go-stock/releases)
+- MACOS绿色版：[go-stock-darwin-universal](https://github.com/CUNLITOU/go-stock/releases)
 
-[//]: # (- MACOS安装版：[go-stock-darwin-universal.pkg]&#40;https://github.com/ArvinLovegood/go-stock/releases&#41;)
+[//]: # (- MACOS安装版：[go-stock-darwin-universal.pkg]&#40;https://github.com/CUNLITOU/go-stock/releases&#41;)
 
 
 ### 💬 支持大模型/平台
@@ -96,7 +96,7 @@
 | 美股支持            | ✅  | 美股数据支持                                                                                                   |
 | 港股支持            | ✅  | 港股数据支持                                                                                                   |
 | 多轮对话            | ✅  | AI分析后可继续对话提问                                                                                             |
-| 自定义AI分析提问模板     | ✅  | 可配置的提问模板 [v2025.2.12.7-alpha](https://github.com/ArvinLovegood/go-stock/releases/tag/v2025.2.12.7-alpha) |
+| 自定义AI分析提问模板     | ✅  | 可配置的提问模板 [v2025.2.12.7-alpha](https://github.com/CUNLITOU/go-stock/releases/tag/v2025.2.12.7-alpha) |
 | 不再强制依赖Chrome浏览器 | ✅  | 默认使用edge浏览器抓取新闻资讯                                                                                        |
 
 ## 👀 更新日志
@@ -153,10 +153,10 @@
 ### 2025.02.22 港股数据支持(目前有延迟)
 
 ### 2025.02.16 AI分析后可继续对话提问
-- [v2025.2.16.1-alpha](https://github.com/ArvinLovegood/go-stock/releases/tag/v2025.2.16.1-alpha)
+- [v2025.2.16.1-alpha](https://github.com/CUNLITOU/go-stock/releases/tag/v2025.2.16.1-alpha)
 
 ### 2025.02.12 可配置的提问模板
-- [v2025.2.12.7-alpha](https://github.com/ArvinLovegood/go-stock/releases/tag/v2025.2.12.7-alpha)
+- [v2025.2.12.7-alpha](https://github.com/CUNLITOU/go-stock/releases/tag/v2025.2.12.7-alpha)
 
 
 ## 🦄 重大更新
@@ -200,7 +200,7 @@
 
 
 ## ⭐ Star History
-[![Star History Chart](https://api.star-history.com/svg?repos=ArvinLovegood/go-stock&type=Date)](https://star-history.com/#ArvinLovegood/go-stock&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=CUNLITOU/go-stock&type=Date)](https://star-history.com/#CUNLITOU/go-stock&Date)
 ## 🤖 状态
 ![Alt](https://repobeats.axiom.co/api/embed/40b07d415a42c2264a18c4fe1b6f182ff1470687.svg "Repobeats analytics image")
 

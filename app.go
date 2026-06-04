@@ -236,7 +236,7 @@ func (a *App) CheckUpdate(flag int) {
 		resp, err := data.SharedHTTPClient.R().
 			SetHeaders(githubApiHeaders).
 			SetResult(releaseVersion).
-			Get("https://api.github.com/repos/ArvinLovegood/go-stock/releases/latest")
+			Get("https://api.github.com/repos/CUNLITOU/go-stock/releases/latest")
 		if err != nil {
 			logger.SugaredLogger.Errorf("get github release version error:%s", err.Error())
 			return
@@ -250,7 +250,7 @@ func (a *App) CheckUpdate(flag int) {
 		resp, err := data.SharedHTTPClient.R().
 			SetHeaders(githubApiHeaders).
 			SetResult(&releases).
-			Get("https://api.github.com/repos/ArvinLovegood/go-stock/releases")
+			Get("https://api.github.com/repos/CUNLITOU/go-stock/releases")
 		if err != nil {
 			logger.SugaredLogger.Errorf("get github releases error:%s", err.Error())
 			return
@@ -291,7 +291,7 @@ func (a *App) CheckUpdate(flag int) {
 		tagResp, tagErr := data.SharedHTTPClient.R().
 			SetHeaders(githubApiHeaders).
 			SetResult(tag).
-			Get("https://api.github.com/repos/ArvinLovegood/go-stock/git/ref/tags/" + releaseVersion.TagName)
+			Get("https://api.github.com/repos/CUNLITOU/go-stock/git/ref/tags/" + releaseVersion.TagName)
 		if tagErr == nil && tagResp.StatusCode() == 200 && tag.Object.Url != "" {
 			releaseVersion.Tag = *tag
 			commit := &models.Commit{}
@@ -331,7 +331,7 @@ func (a *App) CheckUpdate(flag int) {
 		}
 
 		if downloadUrl == "" {
-			downloadUrl = fmt.Sprintf("https://github.com/ArvinLovegood/go-stock/releases/download/%s/%s", releaseVersion.TagName, assetName)
+			downloadUrl = fmt.Sprintf("https://github.com/CUNLITOU/go-stock/releases/download/%s/%s", releaseVersion.TagName, assetName)
 		}
 
 		originalDownloadUrl := downloadUrl
@@ -438,79 +438,26 @@ func (a *App) CheckUpdate(flag int) {
 	}
 }
 
+// isVip 已解除 VIP 限制，始终返回 VIP2 等级且有效
 func (a *App) isVip(sponsorCode string, downloadUrl string, releaseVersion *models.GitHubReleaseVersion) (string, string, bool) {
-	isVip := false
-	vipLevel := "0"
-	sponsorCode = strutil.Trim(a.GetConfig().SponsorCode)
-	if sponsorCode != "" {
-		encrypted, err := hex.DecodeString(sponsorCode)
-		if err != nil {
-			logger.SugaredLogger.Error(err.Error())
-			return "", "0", false
-		}
-		key, err := hex.DecodeString(BuildKey)
-		if err != nil {
-			logger.SugaredLogger.Error(err.Error())
-			return "", "0", false
-		}
-		decrypt := string(cryptor.AesEcbDecrypt(encrypted, key))
-		err = json.Unmarshal([]byte(decrypt), &a.SponsorInfo)
-		if err != nil {
-			logger.SugaredLogger.Error(err.Error())
-			return "", "0", false
-		}
-		vipLevel = a.SponsorInfo["vipLevel"].(string)
-		vipStartTime, err := time.ParseInLocation("2006-01-02 15:04:05", a.SponsorInfo["vipStartTime"].(string), time.Local)
-		vipEndTime, err := time.ParseInLocation("2006-01-02 15:04:05", a.SponsorInfo["vipEndTime"].(string), time.Local)
-		vipAuthTime, err := time.ParseInLocation("2006-01-02 15:04:05", a.SponsorInfo["vipAuthTime"].(string), time.Local)
-		if err != nil {
-			logger.SugaredLogger.Error(err.Error())
-			return "", vipLevel, false
-		}
+	// 解除 VIP 限制，始终返回 VIP2 等级且有效
+	isVip := true
+	vipLevel := "2"
 
-		if time.Now().After(vipAuthTime) && time.Now().After(vipStartTime) && time.Now().Before(vipEndTime) {
-			isVip = true
+	if IsWindows() {
+		winAssetName := "go-stock-windows-amd64.exe"
+		if IsArm64() {
+			winAssetName = "go-stock-windows-arm64.exe"
 		}
-
-		if IsWindows() {
-			winAssetName := "go-stock-windows-amd64.exe"
-			if IsArm64() {
-				winAssetName = "go-stock-windows-arm64.exe"
-			}
-			if isVip {
-				if a.SponsorInfo["winDownUrl"] == nil {
-					downloadUrl = fmt.Sprintf("https://gh.927223.xyz/https://github.com/ArvinLovegood/go-stock/releases/download/%s/%s", releaseVersion.TagName, winAssetName)
-				} else {
-					downloadUrl = a.SponsorInfo["winDownUrl"].(string)
-				}
-			} else {
-				downloadUrl = fmt.Sprintf("https://github.com/ArvinLovegood/go-stock/releases/download/%s/%s", releaseVersion.TagName, winAssetName)
-			}
-		}
-		if IsMacOS() {
-			if isVip {
-				if a.SponsorInfo["macDownUrl"] == nil {
-					downloadUrl = fmt.Sprintf("https://gh.927223.xyz/https://github.com/ArvinLovegood/go-stock/releases/download/%s/go-stock-darwin-universal", releaseVersion.TagName)
-				} else {
-					downloadUrl = a.SponsorInfo["macDownUrl"].(string)
-				}
-			} else {
-				downloadUrl = fmt.Sprintf("https://github.com/ArvinLovegood/go-stock/releases/download/%s/go-stock-darwin-universal", releaseVersion.TagName)
-			}
-		}
-		if IsLinux() {
-			if isVip {
-				if a.SponsorInfo["linuxDownUrl"] == nil {
-					downloadUrl = fmt.Sprintf("https://gh.927223.xyz/https://github.com/ArvinLovegood/go-stock/releases/download/%s/go-stock-linux-amd64", releaseVersion.TagName)
-				} else {
-					downloadUrl = a.SponsorInfo["linuxDownUrl"].(string)
-				}
-			} else {
-				downloadUrl = fmt.Sprintf("https://github.com/ArvinLovegood/go-stock/releases/download/%s/go-stock-linux-amd64", releaseVersion.TagName)
-			}
-		}
-
+		downloadUrl = fmt.Sprintf("https://gh.927223.xyz/https://github.com/CUNLITOU/go-stock/releases/download/%s/%s", releaseVersion.TagName, winAssetName)
 	}
+	if IsMacOS() {
+		downloadUrl = fmt.Sprintf("https://gh.927223.xyz/https://github.com/CUNLITOU/go-stock/releases/download/%s/go-stock-darwin-universal", releaseVersion.TagName)
+	}
+	if IsLinux() {
+		downloadUrl = fmt.Sprintf("https://gh.927223.xyz/https://github.com/CUNLITOU/go-stock/releases/download/%s/go-stock-linux-amd64", releaseVersion.TagName)
+	}
+
 	return downloadUrl, vipLevel, isVip
 }
 

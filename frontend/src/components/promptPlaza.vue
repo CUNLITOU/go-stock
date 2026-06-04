@@ -485,14 +485,8 @@ async function handleCopyContent(content) {
   }
 }
 
+// 已解除 VIP 限制，直接添加提示词
 async function addPromptToTemplate(prompt) {
-  if (prompt.needVip) {
-    const vipInfo = await GetEffectiveSponsorVip()
-    if (!vipInfo || vipInfo.vipLevel <= 0 || !vipInfo.active) {
-      message.warning('该提示词为VIP专属，请先开通VIP')
-      return
-    }
-  }
   try {
     const res = await AddPromptTemplate({
       name: prompt.title,

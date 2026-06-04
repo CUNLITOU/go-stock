@@ -42,25 +42,15 @@ function toEastMoneyCode(code) {
   return ''
 }
 
+// 已解除 VIP 限制，始终返回 VIP2 等级
 async function refreshEffectiveVip() {
-  try {
-    const r = await GetEffectiveSponsorVip()
-    const active = !!r?.active
-    const lvl = Number(r?.vipLevel ?? 0)
-    vipLevel.value = active && !Number.isNaN(lvl) ? lvl : 0
-  } catch (_) {
-    vipLevel.value = 0
-  }
+  vipLevel.value = 2
 }
 
+// 已解除 VIP 限制，不再显示 VIP 提示弹窗
 function startVipCheck() {
   if (vipTimer) clearInterval(vipTimer)
-  if (vipLevel.value < 2) {
-    showVipModal.value = true
-    vipTimer = setInterval(() => {
-      showVipModal.value = true
-    }, 60000)
-  }
+  // 不再显示 VIP 提示弹窗
 }
 
 function findStockList(val) {

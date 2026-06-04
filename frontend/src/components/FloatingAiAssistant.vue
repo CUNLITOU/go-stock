@@ -646,29 +646,16 @@ function closePanel() {
   panelVisible.value = false
 }
 
+// 已解除 VIP 限制，始终返回 VIP2 等级
 async function ensureVipInfo() {
-  if (vipLoaded.value || vipLoading.value) return
-  vipLoading.value = true
-  try {
-    const res = await GetSponsorInfo()
-    const lvl = Number(res?.vipLevel ?? 0)
-    vipLevel.value = Number.isNaN(lvl) ? 0 : lvl
-  } catch (_) {
-    vipLevel.value = 0
-  } finally {
-    vipLoaded.value = true
-    vipLoading.value = false
-  }
+  vipLevel.value = 2
+  vipLoaded.value = true
 }
 
+// 已解除 VIP 限制，直接打开面板
 async function togglePanel() {
   if (!panelVisible.value) {
     ensureSummaryEvent()
-    await ensureVipInfo()
-    if ((vipLevel.value ?? 0) < 2) {
-      message.warning('go-stock AI 助手功能仅对 VIP2 及以上赞助用户开放，请前往关于页面查看赞助方式。')
-      return
-    }
     openPanel()
   } else {
     closePanel()

@@ -7,6 +7,12 @@ on:
       - '*-release'
       - '*-dev'
       - '*-pre'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag for release (e.g., v1.0.0-release)'
+        required: false
+        type: string
 
 env:
   # Necessary for most environments as build failure can occur due to OOM issues
@@ -30,15 +36,6 @@ jobs:
           - name: 'go-stock-windows-arm64.exe'
             platform:  'windows/arm64'
             os: 'windows-latest'
-          - name: 'go-stock-darwin-universal'
-            platform: 'darwin/universal'
-            os: 'macos-latest'
-          - name: 'go-stock-darwin-intel'
-            platform: 'darwin/amd64'
-            os: 'macos-latest'
-          - name: 'go-stock-darwin-arm64'
-            platform: 'darwin/arm64'
-            os: 'macos-latest'
 
     runs-on: ${{ matrix.build.os }}
     steps:
@@ -56,7 +53,12 @@ jobs:
         id: channel
         shell: bash
         run: |
-          TAG="${{ github.ref_name }}"
+          if [ -n "${{ inputs.tag }}" ]; then
+            TAG="${{ inputs.tag }}"
+          else
+            TAG="${{ github.ref_name }}"
+          fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
           if [[ "$TAG" == *-release ]]; then
             echo "channel=release" >> $GITHUB_OUTPUT
             echo "prerelease=false" >> $GITHUB_OUTPUT
@@ -69,6 +71,10 @@ jobs:
             echo "channel=dev" >> $GITHUB_OUTPUT
             echo "prerelease=true" >> $GITHUB_OUTPUT
             echo "channel_label=Dev（开发版）" >> $GITHUB_OUTPUT
+          else
+            echo "channel=release" >> $GITHUB_OUTPUT
+            echo "prerelease=false" >> $GITHUB_OUTPUT
+            echo "channel_label=Release（稳定版）" >> $GITHUB_OUTPUT
           fi
 
       - name: Build wails x go-stock
@@ -79,7 +85,7 @@ jobs:
           build-platform: ${{ matrix.build.platform }}
           package: true
           go-version: '1.26'
-          build-tags: ${{ github.ref_name }}
+          build-tags: ${{ steps.channel.outputs.tag }}
           build-commit-message: ${{ steps.get_commit_message.outputs.commit_message }}
           build-statement: ${{ env.OFFICIAL_STATEMENT }}
           build-key: ${{ env.BUILD_KEY }}
@@ -92,7 +98,7 @@ jobs:
         with:
           script: |
             const { owner, repo } = context.repo;
-            const tag = '${{ github.ref_name }}';
+            const tag = '${{ steps.channel.outputs.tag }}';
             const channel = '${{ steps.channel.outputs.channel }}';
             const channelLabel = '${{ steps.channel.outputs.channel_label }}';
             const prerelease = '${{ steps.channel.outputs.prerelease }}' === 'true';

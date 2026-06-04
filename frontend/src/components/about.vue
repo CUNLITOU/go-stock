@@ -9,10 +9,10 @@ import { addMonths, format ,parse} from 'date-fns';
 import { zhCN } from 'date-fns/locale';
 const updateLog = ref('');
 const versionInfo = ref('');
-const icon = ref('https://raw.githubusercontent.com/ArvinLovegood/go-stock/master/build/appicon.png');
-const alipay =ref('https://github.com/ArvinLovegood/go-stock/raw/master/build/screenshot/alipay.jpg')
-const wxpay =ref('https://github.com/ArvinLovegood/go-stock/raw/master/build/screenshot/wxpay.jpg')
-const wxgzh =ref('https://github.com/ArvinLovegood/go-stock/raw/dev/build/screenshot/%E6%89%AB%E7%A0%81_%E6%90%9C%E7%B4%A2%E8%81%94%E5%90%88%E4%BC%A0%E6%92%AD%E6%A0%B7%E5%BC%8F-%E7%99%BD%E8%89%B2%E7%89%88.png')
+const icon = ref('https://raw.githubusercontent.com/CUNLITOU/go-stock/master/build/appicon.png');
+const alipay =ref('https://github.com/CUNLITOU/go-stock/raw/master/build/screenshot/alipay.jpg')
+const wxpay =ref('https://github.com/CUNLITOU/go-stock/raw/master/build/screenshot/wxpay.jpg')
+const wxgzh =ref('https://github.com/CUNLITOU/go-stock/raw/dev/build/screenshot/%E6%89%AB%E7%A0%81_%E6%90%9C%E7%B4%A2%E8%81%94%E5%90%88%E4%BC%A0%E6%92%AD%E6%A0%B7%E5%BC%8F-%E7%99%BD%E8%89%B2%E7%89%88.png')
 const notify = useNotification()
 const vipLevel=ref("");
 const vipStartTime=ref("");
@@ -252,10 +252,10 @@ EventsOn("updateNeedAdmin", (msg) => {
                 <i style="color: crimson">本软件仅供学习研究目的，AI分析结果仅供参考，本软件不提供任何投资建议或决策，风险自担！</i>
               </p>
               <p>
-                欢迎点赞GitHub：<a href="https://github.com/ArvinLovegood/go-stock" target="_blank">go-stock</a><n-divider vertical />
-                <a href="https://github.com/ArvinLovegood/go-stock" target="_blank">GitHub</a><n-divider vertical />
-                <a href="https://github.com/ArvinLovegood/go-stock/issues" target="_blank">Issues</a><n-divider vertical />
-                <a href="https://github.com/ArvinLovegood/go-stock/releases" target="_blank">Releases</a><n-divider vertical />
+                欢迎点赞GitHub：<a href="https://github.com/CUNLITOU/go-stock" target="_blank">go-stock</a><n-divider vertical />
+                <a href="https://github.com/CUNLITOU/go-stock" target="_blank">GitHub</a><n-divider vertical />
+                <a href="https://github.com/CUNLITOU/go-stock/issues" target="_blank">Issues</a><n-divider vertical />
+                <a href="https://github.com/CUNLITOU/go-stock/releases" target="_blank">Releases</a><n-divider vertical />
               </p>
               <p v-if="updateLog">更新说明：{{updateLog}}</p>
               <p>项目社区：<a href="https://go-stock.sparkmemory.top/" target="_blank">https://go-stock.sparkmemory.top/</a></p>

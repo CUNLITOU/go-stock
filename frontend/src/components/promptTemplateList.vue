@@ -297,22 +297,9 @@ function deletePromptTemplate(id) {
   })
 }
 
+// 已解除 VIP 限制，始终返回 true
 async function checkUserIsVip() {
-  const token = localStorage.getItem('promptPlazaToken')
-  if (!token) return false
-  try {
-    const resp = await fetch(promptPlazaApiBase.value + '/auth/me', {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
-    const json = await resp.json()
-    if (json.code === 0 && json.data) {
-      const user = json.data
-      if (user.vipLevel > 0 && user.vipExpireAt) {
-        return new Date(user.vipExpireAt) > new Date()
-      }
-    }
-  } catch (e) { /* ignore */ }
-  return false
+  return true
 }
 
 async function showShareModal(row) {

@@ -27,22 +27,12 @@ onBeforeMount(()=> {
     }
   })
 
-  GetSponsorInfo().then((res) => {
-   // console.log(res)
-    vipLevel.value = res.vipLevel;
-    vipStartTime.value = res.vipStartTime;
-    vipEndTime.value = res.vipEndTime;
-    //判断时间是否到期
-    if (res.vipLevel) {
-      if (res.vipEndTime < format(new Date(), 'yyyy-MM-dd HH:mm:ss')) {
-        //notify.warning({content: 'VIP已到期'})
-        expired.value = true;
-      }
-    }else{
-      //notify.success({content: '未开通VIP'})
-    }
-    isValidVip.value = !(vipLevel.value === "" || Number(vipLevel.value) <= 0);
-  })
+  // 已解除 VIP 限制，始终设置为 VIP2
+  vipLevel.value = "2";
+  vipStartTime.value = "";
+  vipEndTime.value = "";
+  expired.value = false;
+  isValidVip.value = true;
 })
 onMounted(() => {
   query({
@@ -151,11 +141,7 @@ const columnsRef = ref([
     title: '推荐时',
     key: 'stockPrice',
     render(row, index) {
-
-      if(vipLevel.value===""|| Number(vipLevel.value) <=0){
-        return h(NText, { type: "info" }, { default: () => row.stockPrice })
-      }
-
+      // 已解除 VIP 限制，始终显示完整信息
       let diff = ((Number(row.stockCurrentPrice) - Number(row.stockPrice))/ Number(row.stockPrice)*100).toFixed(2)
       let flagStr="暂平"
       let flag="info"
@@ -184,11 +170,7 @@ const columnsRef = ref([
     title: '开仓价',
     key: 'recommendBuyPrice',
     render(row, index) {
-      if(vipLevel.value===""|| Number(vipLevel.value) <=0){
-        return h(NText, { type: "info" }, { default: () => row.recommendBuyPrice })
-      }
-
-
+      // 已解除 VIP 限制，始终显示完整信息
       if(row.recommendBuyPrice.includes("-")){
         let prices= row.recommendBuyPrice.split("-")
         if(Number(row.stockCurrentPrice)>=Number(prices[0])&&Number(row.stockCurrentPrice)<=Number(prices[1])){
@@ -206,9 +188,7 @@ const columnsRef = ref([
     title: '止盈价',
     key: 'recommendStopProfitPrice',
     render(row, index) {
-      if(vipLevel.value===""|| Number(vipLevel.value) <=0){
-        return h(NText, { type: "info" }, { default: () => row.recommendStopProfitPrice })
-      }
+      // 已解除 VIP 限制，始终显示完整信息
       if(row.recommendStopProfitPrice.includes("-")){
         let prices= row.recommendStopProfitPrice.split("-")
         if(Number(row.stockCurrentPrice)>=Number(prices[0])&&Number(row.stockCurrentPrice)<=Number(prices[1])){
@@ -226,9 +206,7 @@ const columnsRef = ref([
     title: '止损价',
     key: 'recommendStopLossPrice',
     render(row, index) {
-      if(vipLevel.value===""|| Number(vipLevel.value) <=0){
-        return h(NText, { type: "info" }, { default: () => row.recommendStopLossPrice })
-      }
+      // 已解除 VIP 限制，始终显示完整信息
       if(row.recommendStopLossPrice.includes("-")){
         let prices= row.recommendStopLossPrice.split("-")
         if(Number(row.stockCurrentPrice)<=Number(prices[0])){
@@ -439,11 +417,8 @@ function recommendRangeToSinglePrice(p) {
   return s
 }
 
+// 已解除 VIP 限制，直接显示详情
 function showDetail(row) {
-  if(vipLevel.value===""|| Number(vipLevel.value) <=0){
-    notify.warning({content: '未开通VIP或者已经过期'})
-    return
-  }
   modalDataRef.title = row.stockName
   modalDataRef.content = row.recommendReason
   modalDataRef.riskRemarks = row.riskRemarks
