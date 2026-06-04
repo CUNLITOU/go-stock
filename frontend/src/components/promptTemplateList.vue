@@ -322,24 +322,24 @@ async function showShareModal(row) {
   }
 }
 
+// 已解除登录限制
 async function handleShare() {
   if (!shareDataRef.title || !shareDataRef.content) {
     message.warning('标题和内容不能为空')
     return
   }
-  const token = localStorage.getItem('promptPlazaToken')
-  if (!token) {
-    message.warning('请先在"提示词广场"登录后再分享')
-    return
-  }
   shareDataRef.loading = true
   try {
+    const token = localStorage.getItem('promptPlazaToken')
+    const headers = {
+      'Content-Type': 'application/json'
+    }
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`
+    }
     const resp = await fetch(promptPlazaApiBase.value + '/prompts', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
+      headers,
       body: JSON.stringify({
         title: shareDataRef.title,
         content: shareDataRef.content,
@@ -352,11 +352,8 @@ async function handleShare() {
     })
     const json = await resp.json()
     if (json.code !== 0) {
-      if (json.code === 401) {
-        message.error('登录已过期，请先在"提示词广场"重新登录')
-      } else {
-        message.error('分享失败: ' + (json.message || '未知错误'))
-      }
+      // 已解除登录限制，显示通用错误信息
+      message.error('分享失败: ' + (json.message || '未知错误'))
       return
     }
     message.success('分享成功！')

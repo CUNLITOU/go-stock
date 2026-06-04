@@ -211,18 +211,9 @@ async function fetchCurrentUser() {
   }
 }
 
+// 已解除登录限制，不再提示 VIP 登录
 async function checkVipAndPromptLogin() {
-  try {
-    const vipInfo = await GetEffectiveSponsorVip()
-    if (vipInfo && vipInfo.vipLevel > 0 && vipInfo.active) {
-      vipRequireLogin.value = true
-      loginModal.show = true
-      loginModal.tab = 'login'
-      message.info('VIP用户请登录，解锁专属提示词与更多权益')
-    }
-  } catch (e) {
-    console.warn('检查VIP状态失败', e)
-  }
+  // 不再强制登录
 }
 
 async function checkDeviceLimit() {
