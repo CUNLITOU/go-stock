@@ -1,10 +1,10 @@
-# go-stock : 基于大语言模型的AI赋能股票分析工具
+﻿# go-stock : 基于大语言模型的AI赋能股票分析工具
 ## ![go-stock](./build/appicon.png)
-![GitHub Release](https://img.shields.io/github/v/release/ArvinLovegood/go-stock?link=https%3A%2F%2Fgithub.com%2FArvinLovegood%2Fgo-stock%2Freleases&link=https%3A%2F%2Fgithub.com%2FArvinLovegood%2Fgo-stock%2Freleases)
-[![GitHub Repo stars](https://img.shields.io/github/stars/ArvinLovegood/go-stock?link=https%3A%2F%2Fgithub.com%2FArvinLovegood%2Fgo-stock)](https://github.com/ArvinLovegood/go-stock)
-[![star](https://gitee.com/arvinlovegood_admin/go-stock/badge/star.svg?theme=dark)](https://gitee.com/arvinlovegood_admin/go-stock)
+![GitHub Release](https://img.shields.io/github/v/release/CUNLITOU/go-stock?link=https%3A%2F%2Fgithub.com%2FCUNLITOU%2Fgo-stock%2Freleases&link=https%3A%2F%2Fgithub.com%2FCUNLITOU%2Fgo-stock%2Freleases)
+[![GitHub Repo stars](https://img.shields.io/github/stars/CUNLITOU/go-stock?link=https%3A%2F%2Fgithub.com%2FCUNLITOU%2Fgo-stock)](https://github.com/CUNLITOU/go-stock)
+[![star](https://gitee.com/CUNLITOU_admin/go-stock/badge/star.svg?theme=dark)](https://gitee.com/CUNLITOU_admin/go-stock)
 
-[//]: # ([![star]&#40;https://gitcode.com/ArvinLovegood/go-stock/star/badge.svg&#41;]&#40;https://gitcode.com/ArvinLovegood/go-stock&#41;)
+[//]: # ([![star]&#40;https://gitcode.com/CUNLITOU/go-stock/star/badge.svg&#41;]&#40;https://gitcode.com/CUNLITOU/go-stock&#41;)
 
 [//]: # (## 💖 赞助商 &#40;Sponsors&#41;)
 
@@ -82,11 +82,11 @@
 - [go-stock 使用手册（完整功能）](docs/go-stock使用手册.md)
 
 ### 📦 立即体验
-[//]: # (- 安装版：[go-stock-amd64-installer.exe]&#40;https://github.com/ArvinLovegood/go-stock/releases&#41;)
-- 绿色版：[go-stock-windows-amd64.exe](https://github.com/ArvinLovegood/go-stock/releases)
-- MACOS绿色版：[go-stock-darwin-universal](https://github.com/ArvinLovegood/go-stock/releases)
+[//]: # (- 安装版：[go-stock-amd64-installer.exe]&#40;https://github.com/CUNLITOU/go-stock/releases&#41;)
+- 绿色版：[go-stock-windows-amd64.exe](https://github.com/CUNLITOU/go-stock/releases)
+- MACOS绿色版：[go-stock-darwin-universal](https://github.com/CUNLITOU/go-stock/releases)
 
-[//]: # (- MACOS安装版：[go-stock-darwin-universal.pkg]&#40;https://github.com/ArvinLovegood/go-stock/releases&#41;)
+[//]: # (- MACOS安装版：[go-stock-darwin-universal.pkg]&#40;https://github.com/CUNLITOU/go-stock/releases&#41;)
 
 
 ### 💬 支持大模型/平台
@@ -155,7 +155,7 @@
 | 美股支持            | ✅  | 美股数据支持                                                                                                   |
 | 港股支持            | ✅  | 港股数据支持                                                                                                   |
 | 多轮对话            | ✅  | AI分析后可继续对话提问                                                                                             |
-| 自定义AI分析提问模板     | ✅  | 可配置的提问模板 [v2025.2.12.7-alpha](https://github.com/ArvinLovegood/go-stock/releases/tag/v2025.2.12.7-alpha) |
+| 自定义AI分析提问模板     | ✅  | 可配置的提问模板 [v2025.2.12.7-alpha](https://github.com/CUNLITOU/go-stock/releases/tag/v2025.2.12.7-alpha) |
 | 不再强制依赖Chrome浏览器 | ✅  | 默认使用edge浏览器抓取新闻资讯                                                                                        |
 
 ## 👀 更新日志
@@ -378,10 +378,10 @@
 ### 2025.02.22 港股数据支持(目前有延迟)
 
 ### 2025.02.16 AI分析后可继续对话提问
-- [v2025.2.16.1-alpha](https://github.com/ArvinLovegood/go-stock/releases/tag/v2025.2.16.1-alpha)
+- [v2025.2.16.1-alpha](https://github.com/CUNLITOU/go-stock/releases/tag/v2025.2.16.1-alpha)
 
 ### 2025.02.12 可配置的提问模板
-- [v2025.2.12.7-alpha](https://github.com/ArvinLovegood/go-stock/releases/tag/v2025.2.12.7-alpha)
+- [v2025.2.12.7-alpha](https://github.com/CUNLITOU/go-stock/releases/tag/v2025.2.12.7-alpha)
 
 
 ## 🦄 重大更新
@@ -425,11 +425,11 @@
 
 
 ## ⭐ Star History
-<a href="https://www.star-history.com/?repos=ArvinLovegood%2Fgo-stock&type=date&legend=top-left">
+<a href="https://www.star-history.com/?repos=CUNLITOU%2Fgo-stock&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=ArvinLovegood/go-stock&type=date&theme=dark&legend=top-left&sealed_token=v0N4_yMF24lv7OpfWCO3O1wo4Uwy0VjIsJ5qwwsIwEF4A56MdI6nHkqhEzkKymHUvmjlD78zvdwTfg2D0JMcQNt-_KyxVlg7QWPCgln7DXSB7yr2lyYp5g" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=ArvinLovegood/go-stock&type=date&legend=top-left&sealed_token=v0N4_yMF24lv7OpfWCO3O1wo4Uwy0VjIsJ5qwwsIwEF4A56MdI6nHkqhEzkKymHUvmjlD78zvdwTfg2D0JMcQNt-_KyxVlg7QWPCgln7DXSB7yr2lyYp5g" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=ArvinLovegood/go-stock&type=date&legend=top-left&sealed_token=v0N4_yMF24lv7OpfWCO3O1wo4Uwy0VjIsJ5qwwsIwEF4A56MdI6nHkqhEzkKymHUvmjlD78zvdwTfg2D0JMcQNt-_KyxVlg7QWPCgln7DXSB7yr2lyYp5g" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=CUNLITOU/go-stock&type=date&theme=dark&legend=top-left&sealed_token=v0N4_yMF24lv7OpfWCO3O1wo4Uwy0VjIsJ5qwwsIwEF4A56MdI6nHkqhEzkKymHUvmjlD78zvdwTfg2D0JMcQNt-_KyxVlg7QWPCgln7DXSB7yr2lyYp5g" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=CUNLITOU/go-stock&type=date&legend=top-left&sealed_token=v0N4_yMF24lv7OpfWCO3O1wo4Uwy0VjIsJ5qwwsIwEF4A56MdI6nHkqhEzkKymHUvmjlD78zvdwTfg2D0JMcQNt-_KyxVlg7QWPCgln7DXSB7yr2lyYp5g" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=CUNLITOU/go-stock&type=date&legend=top-left&sealed_token=v0N4_yMF24lv7OpfWCO3O1wo4Uwy0VjIsJ5qwwsIwEF4A56MdI6nHkqhEzkKymHUvmjlD78zvdwTfg2D0JMcQNt-_KyxVlg7QWPCgln7DXSB7yr2lyYp5g" />
  </picture>
 </a>
 
@@ -440,7 +440,7 @@
 - 本软件基于开源技术构建，使用Wails、NaiveUI、Vue、AI大模型等开源项目。 技术上如有问题，可以先向对应的开源社区请求帮助。
 - 开源不易，本人精力和时间有限，如需一对一技术支持，请先赞助。联系QQ(备注 技术支持)：506808970
 
-[//]: # (<img src="./build/wx.jpg" width="301px" height="402px" alt="ArvinLovegood">)
+[//]: # (<img src="./build/wx.jpg" width="301px" height="402px" alt="CUNLITOU">)
 
 
 | 技术支持方式                          | 赞助(元) | 

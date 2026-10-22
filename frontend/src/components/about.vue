@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { MdPreview } from 'md-editor-v3';
 import 'md-editor-v3/lib/preview.css';
 import {h, computed, nextTick, onBeforeUnmount, onMounted, ref} from 'vue';
@@ -8,10 +8,10 @@ import {NAvatar, NButton, NTree, useNotification,NText} from "naive-ui";
 import { zhCN } from 'date-fns/locale';
 const updateLog = ref('');
 const versionInfo = ref('');
-const icon = ref('https://raw.githubusercontent.com/ArvinLovegood/go-stock/master/build/appicon.png');
-const alipay =ref('https://github.com/ArvinLovegood/go-stock/raw/master/build/screenshot/alipay.jpg')
-const wxpay =ref('https://github.com/ArvinLovegood/go-stock/raw/master/build/screenshot/wxpay.jpg')
-const wxgzh =ref('https://github.com/ArvinLovegood/go-stock/raw/dev/build/screenshot/%E6%89%AB%E7%A0%81_%E6%90%9C%E7%B4%A2%E8%81%94%E5%90%88%E4%BC%A0%E6%92%AD%E6%A0%B7%E5%BC%8F-%E7%99%BD%E8%89%B2%E7%89%88.png')
+const icon = ref('https://raw.githubusercontent.com/CUNLITOU/go-stock/master/build/appicon.png');
+const alipay =ref('https://github.com/CUNLITOU/go-stock/raw/master/build/screenshot/alipay.jpg')
+const wxpay =ref('https://github.com/CUNLITOU/go-stock/raw/master/build/screenshot/wxpay.jpg')
+const wxgzh =ref('https://github.com/CUNLITOU/go-stock/raw/dev/build/screenshot/%E6%89%AB%E7%A0%81_%E6%90%9C%E7%B4%A2%E8%81%94%E5%90%88%E4%BC%A0%E6%92%AD%E6%A0%B7%E5%BC%8F-%E7%99%BD%E8%89%B2%E7%89%88.png')
 const notify = useNotification()
 // VIP 展示与功能门控共用后端 GetEffectiveSponsorVip 的权威判定结果：
 // 只展示「当前是否生效」，避免关于页显示 VIP2 但 K线分析/AI助手提示权限不足。
@@ -368,7 +368,7 @@ EventsOn("updateNeedAdmin", (msg) => {
                 <template #icon>📖</template>
                 查看用户手册
               </n-button>
-              <n-button size="small" tag="a" href="https://github.com/ArvinLovegood/go-stock" target="_blank" type="default" tertiary round>
+              <n-button size="small" tag="a" href="https://github.com/CUNLITOU/go-stock" target="_blank" type="default" tertiary round>
                 <template #icon>⭐</template>
                 GitHub
               </n-button>

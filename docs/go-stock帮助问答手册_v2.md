@@ -1,4 +1,4 @@
-# go-stock 帮助问答手册
+﻿# go-stock 帮助问答手册
 
 > 基于大语言模型的AI赋能股票分析桌面工具 — 常见问题与解答
 > 本手册最后更新于 2026.05
@@ -577,7 +577,7 @@
 ### Q: 如何获取技术支持？
 
 **A:** 可通过以下渠道获取支持：
-- GitHub Issues：https://github.com/ArvinLovegood/go-stock/issues
+- GitHub Issues：https://github.com/CUNLITOU/go-stock/issues
 - 项目社区：https://go-stock.sparkmemory.top/
 - QQ交流群：491605333
 - 商业授权或定制开发需联系作者，技术支持需先赞助（单次支持¥100，长期支持¥5000）

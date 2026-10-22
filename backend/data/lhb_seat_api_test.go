@@ -1,4 +1,4 @@
-package data
+﻿package data
 
 import (
 	"fmt"
@@ -110,8 +110,8 @@ func TestLhbDailySummary(t *testing.T) {
 // TestNormalizeRemoteSeatURL 验证 GitHub blob 链接自动转 raw
 func TestNormalizeRemoteSeatURL(t *testing.T) {
 	cases := []struct{ in, want string }{
-		{"https://gh-proxy.com/https://github.com/ArvinLovegood/go-stock/blob/dev/data/hot_money_seats.json",
-			"https://gh-proxy.com/https://raw.githubusercontent.com/ArvinLovegood/go-stock/dev/data/hot_money_seats.json"},
+		{"https://gh-proxy.com/https://github.com/CUNLITOU/go-stock/blob/dev/data/hot_money_seats.json",
+			"https://gh-proxy.com/https://raw.githubusercontent.com/CUNLITOU/go-stock/dev/data/hot_money_seats.json"},
 		{"https://github.com/a/b/blob/main/c.json",
 			"https://raw.githubusercontent.com/a/b/main/c.json"},
 		{"https://gh-proxy.com/https://raw.githubusercontent.com/a/b/main/c.json",

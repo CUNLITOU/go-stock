@@ -139,20 +139,16 @@ func (a *App) GetSponsorInfo() map[string]any {
 	return a.getSponsorInfoCopy()
 }
 
-// GetEffectiveSponsorVip 从本地配置解密赞助信息并判断当前是否在 VIP 有效期内
-// （与 ai-assistant-web / data.EffectiveSponsorVipStatus 一致）。
-// 返回值同时带上未生效原因与赞助码中的时间，使「关于页显示 VIP2，功能却提示权限不足」这类
-// 展示与门控不一致的问题可以直接在界面上看到原因。
+// GetEffectiveSponsorVip 始终返回 VIP2 有效状态（已解除 VIP 限制）。
 func (a *App) GetEffectiveSponsorVip() map[string]any {
-	status := data.EffectiveSponsorVipStatus()
 	return map[string]any{
-		"vipLevel":  status.Level,
-		"active":    status.Active,
-		"reason":    status.Reason,
-		"user":      status.User,
-		"startTime": status.StartTime,
-		"endTime":   status.EndTime,
-		"authTime":  status.AuthTime,
+		"vipLevel":  2,
+		"active":    true,
+		"reason":    "",
+		"user":      "",
+		"startTime": "",
+		"endTime":   "2099-12-31 23:59:59",
+		"authTime":  "",
 	}
 }
 
@@ -340,7 +336,7 @@ func (a *App) CheckUpdate(flag int) {
 		runtime.EventsEmit(a.ctx, "updateCheckFailed", map[string]any{
 			"stage":       stage,
 			"message":     message,
-			"releasesUrl": "https://github.com/ArvinLovegood/go-stock/releases",
+			"releasesUrl": "https://github.com/CUNLITOU/go-stock/releases",
 		})
 	}
 	emitDone := func(hasUpdate bool) {
@@ -399,7 +395,7 @@ func (a *App) CheckUpdate(flag int) {
 		resp, err := apiClient.R().
 			SetHeaders(githubApiHeaders).
 			SetResult(releaseVersion).
-			Get("https://api.github.com/repos/ArvinLovegood/go-stock/releases/latest")
+			Get("https://api.github.com/repos/CUNLITOU/go-stock/releases/latest")
 		if err != nil {
 			logger.SugaredLogger.Errorf("get github release version error:%s", err.Error())
 			emitFailed("metadata", "无法连接更新服务器，请检查网络后重试。")
@@ -415,7 +411,7 @@ func (a *App) CheckUpdate(flag int) {
 		resp, err := apiClient.R().
 			SetHeaders(githubApiHeaders).
 			SetResult(&releases).
-			Get("https://api.github.com/repos/ArvinLovegood/go-stock/releases")
+			Get("https://api.github.com/repos/CUNLITOU/go-stock/releases")
 		if err != nil {
 			logger.SugaredLogger.Errorf("get github releases error:%s", err.Error())
 			emitFailed("metadata", "无法连接更新服务器，请检查网络后重试。")
@@ -461,7 +457,7 @@ func (a *App) CheckUpdate(flag int) {
 		tagResp, tagErr := apiClient.R().
 			SetHeaders(githubApiHeaders).
 			SetResult(tag).
-			Get("https://api.github.com/repos/ArvinLovegood/go-stock/git/ref/tags/" + releaseVersion.TagName)
+			Get("https://api.github.com/repos/CUNLITOU/go-stock/git/ref/tags/" + releaseVersion.TagName)
 		if tagErr == nil && tagResp.StatusCode() == 200 && tag.Object.Url != "" {
 			releaseVersion.Tag = *tag
 			commit := &models.Commit{}
@@ -509,7 +505,7 @@ func (a *App) CheckUpdate(flag int) {
 		}
 
 		if downloadUrl == "" {
-			downloadUrl = fmt.Sprintf("https://github.com/ArvinLovegood/go-stock/releases/download/%s/%s", releaseVersion.TagName, assetName)
+			downloadUrl = fmt.Sprintf("https://github.com/CUNLITOU/go-stock/releases/download/%s/%s", releaseVersion.TagName, assetName)
 		}
 
 		// 当前平台的安装包未包含在该 Release 中（如历史版本未发布 Linux 资产）时，
@@ -724,78 +720,29 @@ func (a *App) downloadUpdate(url string, tmpPath string, totalSize int64, downlo
 }
 
 func (a *App) isVip(sponsorCode string, downloadUrl string, releaseVersion *models.GitHubReleaseVersion) (string, string, bool) {
-	isVip := false
-	vipLevel := "0"
-	sponsorCode = strutil.Trim(a.GetConfig().SponsorCode)
-	if sponsorCode != "" {
-		raw, err := data.SafeDecryptSponsorCode(sponsorCode, BuildKey)
-		if err != nil {
-			logger.SugaredLogger.Errorf("赞助码解密失败: %s", err.Error())
-			return "", "0", false
-		}
-		if err = a.setSponsorInfo(raw); err != nil {
-			logger.SugaredLogger.Error(err.Error())
-			return "", "0", false
-		}
-		// 快照读取：解析期间 map 已被整体替换，这里取锁内拷贝，避免并发遍历/读取竞态
-		sponsorInfo := a.getSponsorInfoCopy()
-		// 赞助码 JSON 字段类型不保证（如 vipLevel 可能为数字），统一用 convertor.ToString 安全转换，
-		// 禁止 .(string) 硬断言（interface conversion panic 会导致整个进程闪退）
-		vipLevel = convertor.ToString(sponsorInfo["vipLevel"])
-		// 有效期判定与展示端（EffectiveSponsorVipStatus）共用同一份规则：
-		// 这里曾用同一个 err 承接三次 time.ParseInLocation，任一字段解析失败都会被后一次的 nil 覆盖，
-		// 导致「关于页按原始字段展示为 VIP2，功能门控却判为无效」的两套结论。
-		status := data.EvaluateSponsorVipInfo(sponsorInfo)
-		isVip = status.Active
-		if !isVip {
-			logger.SugaredLogger.Warnf("赞助码权益未生效: level=%s reason=%s", vipLevel, status.Reason)
-		}
+	// 已解除 VIP 限制：始终返回 VIP2 active=true
+	// 但保留 downloadUrl 逻辑，确保更新下载正常工作
+	vipLevel := "2"
+	isVip := true
 
-		if IsWindows() {
-			winAssetName := "go-stock-windows-amd64.exe"
-			if IsArm64() {
-				winAssetName = "go-stock-windows-arm64.exe"
-			}
-			if isVip {
-				if sponsorInfo["winDownUrl"] == nil {
-					downloadUrl = fmt.Sprintf("https://gh.927223.xyz/https://github.com/ArvinLovegood/go-stock/releases/download/%s/%s", releaseVersion.TagName, winAssetName)
-				} else {
-					downloadUrl = convertor.ToString(sponsorInfo["winDownUrl"])
-				}
-			} else {
-				downloadUrl = fmt.Sprintf("https://github.com/ArvinLovegood/go-stock/releases/download/%s/%s", releaseVersion.TagName, winAssetName)
-			}
+	if IsWindows() {
+		winAssetName := "go-stock-windows-amd64.exe"
+		if IsArm64() {
+			winAssetName = "go-stock-windows-arm64.exe"
 		}
-		if IsMacOS() {
-			// 必须使用 .app bundle 的 zip 包（见 update_helper_darwin.go），
-			// 裸二进制 URL 会导致 ApplyMacUpdate 解压失败
-			if isVip {
-				if sponsorInfo["macDownUrl"] == nil {
-					downloadUrl = fmt.Sprintf("https://gh.927223.xyz/https://github.com/ArvinLovegood/go-stock/releases/download/%s/go-stock-darwin-universal.zip", releaseVersion.TagName)
-				} else {
-					downloadUrl = convertor.ToString(sponsorInfo["macDownUrl"])
-				}
-			} else {
-				downloadUrl = fmt.Sprintf("https://github.com/ArvinLovegood/go-stock/releases/download/%s/go-stock-darwin-universal.zip", releaseVersion.TagName)
-			}
-		}
-		if IsLinux() {
-			linuxAssetName := "go-stock-linux-amd64"
-			if IsArm64() {
-				linuxAssetName = "go-stock-linux-arm64"
-			}
-			if isVip {
-				if sponsorInfo["linuxDownUrl"] == nil {
-					downloadUrl = fmt.Sprintf("https://gh.927223.xyz/https://github.com/ArvinLovegood/go-stock/releases/download/%s/%s", releaseVersion.TagName, linuxAssetName)
-				} else {
-					downloadUrl = convertor.ToString(sponsorInfo["linuxDownUrl"])
-				}
-			} else {
-				downloadUrl = fmt.Sprintf("https://github.com/ArvinLovegood/go-stock/releases/download/%s/%s", releaseVersion.TagName, linuxAssetName)
-			}
-		}
-
+		downloadUrl = fmt.Sprintf("https://github.com/CUNLITOU/go-stock/releases/download/%s/%s", releaseVersion.TagName, winAssetName)
 	}
+	if IsMacOS() {
+		downloadUrl = fmt.Sprintf("https://github.com/CUNLITOU/go-stock/releases/download/%s/go-stock-darwin-universal.zip", releaseVersion.TagName)
+	}
+	if IsLinux() {
+		linuxAssetName := "go-stock-linux-amd64"
+		if IsArm64() {
+			linuxAssetName = "go-stock-linux-arm64"
+		}
+		downloadUrl = fmt.Sprintf("https://github.com/CUNLITOU/go-stock/releases/download/%s/%s", releaseVersion.TagName, linuxAssetName)
+	}
+
 	return downloadUrl, vipLevel, isVip
 }
 

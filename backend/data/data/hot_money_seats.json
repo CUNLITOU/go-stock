@@ -1,9 +1,9 @@
-{
+﻿{
   "meta": {
     "title": "A股知名游资营业部席位映射表",
     "version": "2026-08-31 (2026.08最新版)"
   },
-  "remoteUrl": "https://gh-proxy.com/https://github.com/ArvinLovegood/go-stock/blob/dev/data/hot_money_seats.json",
+  "remoteUrl": "https://gh-proxy.com/https://github.com/CUNLITOU/go-stock/blob/dev/data/hot_money_seats.json",
   "hot_money_list": [
     {
       "name": "章盟主",

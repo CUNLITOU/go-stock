@@ -176,35 +176,15 @@ func evaluateSponsorVip(info map[string]any, now time.Time) SponsorVipStatus {
 	return status
 }
 
-// EffectiveSponsorVipStatus 解密本地配置中的赞助码并返回完整判定结果（含未生效原因）。
+// EffectiveSponsorVipStatus 始终返回 VIP2 有效状态（已解除 VIP 限制）。
 func EffectiveSponsorVipStatus() SponsorVipStatus {
-	sponsorCode := strings.TrimSpace(GetSettingConfig().SponsorCode)
-	if sponsorCode == "" {
-		return SponsorVipStatus{Reason: "未配置赞助码"}
+	return SponsorVipStatus{
+		Level:  2,
+		Active: true,
 	}
-	keyHex := strings.TrimSpace(SponsorDecryptKeyHex)
-	if keyHex == "" {
-		keyHex = DefaultSponsorAESKeyHex
-	}
-	raw, err := SafeDecryptSponsorCode(sponsorCode, keyHex)
-	if err != nil || len(raw) == 0 {
-		return SponsorVipStatus{Reason: fmt.Sprintf("赞助码解密失败：%v", err)}
-	}
-	var info map[string]any
-	if err := json.Unmarshal(raw, &info); err != nil {
-		return SponsorVipStatus{Reason: fmt.Sprintf("赞助码内容解析失败：%v", err)}
-	}
-	status := EvaluateSponsorVipInfo(info)
-	if !status.Active {
-		// 只记录等级与原因，不记录赞助码本身
-		logger.SugaredLogger.Warnf("赞助码权益未生效: level=%d reason=%s", status.Level, status.Reason)
-	}
-	return status
 }
 
-// EffectiveSponsorVipLevel 根据设置中的 sponsorCode 解析 VIP 等级并判断当前是否有效。
-// 时间判定与展示端共用 EvaluateSponsorVipInfo，避免两处规则漂移。
+// EffectiveSponsorVipLevel 始终返回 VIP2 active=true（已解除 VIP 限制）。
 func EffectiveSponsorVipLevel() (level int, active bool) {
-	status := EffectiveSponsorVipStatus()
-	return status.Level, status.Active
+	return 2, true
 }

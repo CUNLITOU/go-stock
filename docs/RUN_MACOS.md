@@ -1,4 +1,4 @@
-# go-stock macOS 运行指南
+﻿# go-stock macOS 运行指南
 
 本文档说明如何在 macOS 上运行已编译好的 go-stock 二进制程序。
 
@@ -35,7 +35,7 @@ uname -m
 - **裸可执行文件**：`go-stock-darwin-arm64`（约 120 MB，下载后需手动添加执行权限）
 - **压缩包**：`go-stock-darwin-arm64.zip`（约 31 MB，解压后通常已带执行权限）
 
-下载地址：https://github.com/ArvinLovegood/go-stock/releases
+下载地址：https://github.com/CUNLITOU/go-stock/releases
 
 > 建议下载 `.zip` 版本，体积更小且解压后通常保留执行权限；裸文件下载后需额外 `chmod +x`。
 
@@ -89,7 +89,7 @@ xattr -c go-stock-darwin-arm64
 
 ```bash
 # 下载（以 arm64 zip 为例）
-curl -LO https://github.com/ArvinLovegood/go-stock/releases/latest/download/go-stock-darwin-arm64.zip
+curl -LO https://github.com/CUNLITOU/go-stock/releases/latest/download/go-stock-darwin-arm64.zip
 
 # 解压并赋权
 unzip go-stock-darwin-arm64.zip
@@ -264,7 +264,7 @@ open "${APP_DIR}"
 
 ## 九、技术支持
 
-如有问题，请提交 Issue 至：https://github.com/ArvinLovegood/go-stock/issues
+如有问题，请提交 Issue 至：https://github.com/CUNLITOU/go-stock/issues
 
 ## 许可证
 

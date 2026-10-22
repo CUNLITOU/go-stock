@@ -94,17 +94,12 @@ func (a *app) vipStatus(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
-	level, active := data.EffectiveSponsorVipLevel()
-	ok := active && level >= 2
-	payload := map[string]any{
-		"ok":       ok,
-		"vipLevel": level,
-		"active":   active,
-	}
-	if !ok {
-		payload["message"] = vipDeniedMessage(level, active)
-	}
-	writeJSON(w, http.StatusOK, payload)
+	// 已解除 VIP 限制：始终返回 VIP2 active=true
+	writeJSON(w, http.StatusOK, map[string]any{
+		"ok":       true,
+		"vipLevel": 2,
+		"active":   true,
+	})
 }
 
 func vipDeniedMessage(level int, active bool) string {
@@ -115,17 +110,8 @@ func vipDeniedMessage(level int, active bool) string {
 }
 
 func requireVip2(w http.ResponseWriter) bool {
-	level, active := data.EffectiveSponsorVipLevel()
-	if active && level >= 2 {
-		return true
-	}
-	writeJSON(w, http.StatusForbidden, map[string]any{
-		"code":     "VIP2_REQUIRED",
-		"message":  vipDeniedMessage(level, active),
-		"vipLevel": level,
-		"active":   active,
-	})
-	return false
+	// 已解除 VIP 限制：始终放行
+	return true
 }
 
 func (a *app) getAIConfigs(w http.ResponseWriter, _ *http.Request) {

@@ -1,4 +1,4 @@
-# go-stock 使用手册
+﻿# go-stock 使用手册
 
 > 基于大语言模型的 AI 赋能股票分析桌面工具
 > 支持 A股 / 港股 / 美股 | 24+ AI平台 | 150+ AI分析工具
@@ -1276,7 +1276,7 @@ MCP（Model Context Protocol）服务器管理：
 
 ### 13.3 关于作者
 
-- 作者：@ArvinLovegood
+- 作者：@CUNLITOU
 - 微信公众号二维码
 - 赞赏码（支付宝 + 微信）
 

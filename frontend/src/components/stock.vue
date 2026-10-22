@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import {computed, h, nextTick, onBeforeMount, onBeforeUnmount, onMounted, reactive, ref, watch} from 'vue'
 import * as echarts from 'echarts';
 import {
@@ -487,7 +487,7 @@ const tabNavBgColor = computed(() => {
   return data.darkTheme ? 'rgb(16, 16, 20)' : '#ffffff'
 })
 
-const icon = ref('https://raw.githubusercontent.com/ArvinLovegood/go-stock/master/build/appicon.png');
+const icon = ref('https://raw.githubusercontent.com/CUNLITOU/go-stock/master/build/appicon.png');
 
 const sortedResults = computed(() => {
   const sortedKeys = keys(results.value).sort();
@@ -3378,7 +3378,7 @@ async function saveAsWord() {
 <br>
 本报告由go-stock项目生成：
 <p>
-<a href="https://github.com/ArvinLovegood/go-stock">
+<a href="https://github.com/CUNLITOU/go-stock">
 AI赋能股票分析：自选股行情获取，成本盈亏展示，涨跌报警推送，市场整体/个股情绪分析，K线技术指标分析等。数据全部保留在本地。支持DeepSeek，OpenAI， Ollama，LMStudio，AnythingLLM，硅基流动，火山方舟，阿里云百炼等平台或模型。
 </a></p>
 `

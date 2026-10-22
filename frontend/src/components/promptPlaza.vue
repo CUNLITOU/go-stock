@@ -104,9 +104,8 @@ onMounted(() => {
   loadPrompts()
   if (token.value) {
     fetchCurrentUser()
-  } else {
-    checkVipAndPromptLogin()
   }
+  // 已解除广场登录强制要求：不再对 VIP 用户自动弹窗
 })
 
 async function apiGet(path, params = {}) {
@@ -374,11 +373,7 @@ async function loadComments(promptId) {
 }
 
 async function handleLike(prompt) {
-  if (!isLoggedIn.value) {
-    message.warning('请先登录')
-    loginModal.show = true
-    return
-  }
+  // 已解除登录强制要求：未登录也允许点赞（由服务端决定匿名处理方式）
   try {
     const data = await apiPost(`/prompts/${prompt.id}/like`)
     prompt.isLiked = data.isLiked
@@ -393,11 +388,7 @@ async function handleLike(prompt) {
 }
 
 async function handleFavorite(prompt) {
-  if (!isLoggedIn.value) {
-    message.warning('请先登录')
-    loginModal.show = true
-    return
-  }
+  // 已解除登录强制要求
   try {
     const data = await apiPost(`/prompts/${prompt.id}/favorite`)
     prompt.isFavorited = data.isFavorited
@@ -477,11 +468,7 @@ async function addPromptToTemplate(prompt) {
 }
 
 async function submitComment() {
-  if (!isLoggedIn.value) {
-    message.warning('请先登录')
-    loginModal.show = true
-    return
-  }
+  // 已解除登录强制要求
   if (!detailModal.newComment.trim()) {
     message.warning('请输入评论内容')
     return
@@ -582,11 +569,7 @@ function handleDeletePrompt(prompt) {
 }
 
 async function showCreateModal() {
-  if (!isLoggedIn.value) {
-    message.warning('请先登录')
-    loginModal.show = true
-    return
-  }
+  // 已解除登录强制要求
   createModal.title = ''
   createModal.content = ''
   createModal.description = ''

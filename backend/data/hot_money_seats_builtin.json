@@ -1,4 +1,4 @@
-{
+﻿{
   "meta": {
     "title": "A股知名游资营业部席位映射表",
     "version": "2026-08-31 (2026.08最新版)",
@@ -17,7 +17,7 @@
     "disclaimer": "游资花名与营业部的映射为社区推断性共识（依据席位历史操作风格），非官方认定。存在一人多席位、席位迁移、借马甲等情况。仅供情绪分析与龙虎榜研究参考，不构成投资建议。",
     "match_strategy": "龙虎榜原始数据按 seat 全称模糊匹配（含'证券'与'营业部'可省略）；同游资命中任一席位即视为该游资上榜；primary=true 的席位权重最高。"
   },
-  "remoteUrl": "https://gh-proxy.com/https://github.com/ArvinLovegood/go-stock/blob/dev/data/hot_money_seats.json",
+  "remoteUrl": "https://gh-proxy.com/https://github.com/CUNLITOU/go-stock/blob/dev/data/hot_money_seats.json",
   "hot_money_list": [
     {
       "name": "章盟主",

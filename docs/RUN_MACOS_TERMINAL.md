@@ -1,4 +1,4 @@
-# go-stock macOS 终端手动运行二进制指南
+﻿# go-stock macOS 终端手动运行二进制指南
 
 本文档说明如何在 macOS 终端中手动运行**已编译好的 go-stock 二进制文件**，适用于从 GitHub Releases 下载的裸可执行文件，或本地 / CI 交叉编译产物。
 
@@ -33,11 +33,11 @@ uname -m
 
 按来源三选一：
 
-**方式 A — 从 GitHub Releases 下载**（https://github.com/ArvinLovegood/go-stock/releases）
+**方式 A — 从 GitHub Releases 下载**（https://github.com/CUNLITOU/go-stock/releases）
 
 ```bash
 # 推荐 .zip（体积小，解压后通常保留执行权限）
-curl -LO https://github.com/ArvinLovegood/go-stock/releases/latest/download/go-stock-darwin-arm64.zip
+curl -LO https://github.com/CUNLITOU/go-stock/releases/latest/download/go-stock-darwin-arm64.zip
 unzip go-stock-darwin-arm64.zip
 ```
 
@@ -151,7 +151,7 @@ pkill -f go-stock-darwin
 set -e
 
 # 1. 下载并解压
-curl -LO https://github.com/ArvinLovegood/go-stock/releases/latest/download/go-stock-darwin-arm64.zip
+curl -LO https://github.com/CUNLITOU/go-stock/releases/latest/download/go-stock-darwin-arm64.zip
 unzip -o go-stock-darwin-arm64.zip
 
 # 2. 放入专属目录

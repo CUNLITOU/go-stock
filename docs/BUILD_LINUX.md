@@ -1,4 +1,4 @@
-# go-stock Linux 构建指南
+﻿# go-stock Linux 构建指南
 
 本文档说明如何在 Linux 平台上编译和运行 go-stock 应用程序。
 
@@ -73,7 +73,7 @@ go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
 ```bash
 # 克隆项目
-git clone https://github.com/ArvinLovegood/go-stock.git
+git clone https://github.com/CUNLITOU/go-stock.git
 cd go-stock
 
 # 运行构建脚本
@@ -244,7 +244,7 @@ dpkg-deb --build go-stock go-stock.deb
 ## 技术支持
 
 如有问题，请提交 Issue 至：
-https://github.com/ArvinLovegood/go-stock/issues
+https://github.com/CUNLITOU/go-stock/issues
 
 ## 许可证
 

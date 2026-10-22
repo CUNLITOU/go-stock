@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import * as echarts from "echarts";
 import {computed, h, nextTick, onBeforeMount, onBeforeUnmount, onMounted,onUnmounted, ref} from 'vue'
 import {
@@ -52,7 +52,7 @@ import RzrqRank from "./RzrqRank.vue";
 import FuturesPositionChart from "./FuturesPositionChart.vue";
 
 const route = useRoute()
-const icon = ref('https://raw.githubusercontent.com/ArvinLovegood/go-stock/master/build/appicon.png');
+const icon = ref('https://raw.githubusercontent.com/CUNLITOU/go-stock/master/build/appicon.png');
 
 const message = useMessage()
 const notify = useNotification()

@@ -1,4 +1,4 @@
-package data
+﻿package data
 
 import (
 	_ "embed"
@@ -233,7 +233,7 @@ type HotMoneySeatFile struct {
 var hotMoneySeatsFile = apppath.File("hot_money_seats.json")
 
 // defaultHotMoneySeatsRemoteURL 默认远程名录源（上游仓库 dev 分支）
-const defaultHotMoneySeatsRemoteURL = "https://gh-proxy.com/https://github.com/ArvinLovegood/go-stock/blob/dev/data/hot_money_seats.json"
+const defaultHotMoneySeatsRemoteURL = "https://gh-proxy.com/https://github.com/CUNLITOU/go-stock/blob/dev/data/hot_money_seats.json"
 
 // normalizeRemoteSeatURL 归一化远程名录 URL：GitHub blob 链接返回 HTML 页面而非 JSON，
 // 需转为 raw 地址（github.com/OWNER/REPO/blob/REF/PATH → raw.githubusercontent.com/OWNER/REPO/REF/PATH）。

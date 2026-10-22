@@ -153,10 +153,7 @@ async function showDetail(questionId) {
 }
 
 function showAskModal() {
-  if (!isLoggedIn.value) {
-    message.warning('请先在"提示词广场"登录后再提问')
-    return
-  }
+  // 已解除登录强制要求
   askModal.title = ''
   askModal.content = ''
   askModal.promptId = null
@@ -203,10 +200,7 @@ async function handleDeleteQuestion(question) {
 }
 
 async function submitAnswer() {
-  if (!isLoggedIn.value) {
-    message.warning('请先在"提示词广场"登录后再回答')
-    return
-  }
+  // 已解除登录强制要求
   if (!detailModal.newAnswer.trim()) {
     message.warning('请输入回答内容')
     return
@@ -225,7 +219,7 @@ async function submitAnswer() {
 }
 
 async function handleAcceptAnswer(answer) {
-  if (!isLoggedIn.value) return
+  // 已解除登录强制要求
   try {
     await apiPost(`/answers/${answer.id}/accept`)
     detailModal.answers.forEach(a => { a.isAccepted = false })
@@ -258,10 +252,7 @@ async function handleDeleteAnswer(answer) {
 }
 
 async function handleAnswerLike(answer) {
-  if (!isLoggedIn.value) {
-    message.warning('请先登录')
-    return
-  }
+  // 已解除登录强制要求
   try {
     const data = await apiPost(`/answers/${answer.id}/like`)
     answer.isLiked = data.isLiked
