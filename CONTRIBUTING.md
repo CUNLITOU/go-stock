@@ -1,4 +1,4 @@
-﻿# Contributing to [go-stock]
+# Contributing to [go-stock]
 
 感谢你对 [go-stock] 项目的兴趣并愿意贡献代码！本指南将帮助你了解如何为这个项目做出贡献。
 

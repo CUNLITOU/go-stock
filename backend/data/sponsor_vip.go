@@ -2,7 +2,6 @@ package data
 
 import (
 	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
@@ -12,7 +11,6 @@ import (
 
 	"github.com/duke-git/lancet/v2/convertor"
 	"github.com/duke-git/lancet/v2/cryptor"
-	"go-stock/backend/logger"
 )
 
 // DefaultSponsorAESKeyHex 占位密钥，仅用于社区自行编译、未注入正式密钥的场景：

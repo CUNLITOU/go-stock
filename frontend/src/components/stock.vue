@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import {computed, h, nextTick, onBeforeMount, onBeforeUnmount, onMounted, reactive, ref, watch} from 'vue'
 import * as echarts from 'echarts';
 import {

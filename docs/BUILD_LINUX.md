@@ -1,4 +1,4 @@
-﻿# go-stock Linux 构建指南
+# go-stock Linux 构建指南
 
 本文档说明如何在 Linux 平台上编译和运行 go-stock 应用程序。
 

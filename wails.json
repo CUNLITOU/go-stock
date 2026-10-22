@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "go-stock",
   "outputfilename": "go-stock",
   "frontend:install": "npm install",

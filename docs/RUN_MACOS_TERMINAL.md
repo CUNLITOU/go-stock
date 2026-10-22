@@ -1,4 +1,4 @@
-﻿# go-stock macOS 终端手动运行二进制指南
+# go-stock macOS 终端手动运行二进制指南
 
 本文档说明如何在 macOS 终端中手动运行**已编译好的 go-stock 二进制文件**，适用于从 GitHub Releases 下载的裸可执行文件，或本地 / CI 交叉编译产物。
 

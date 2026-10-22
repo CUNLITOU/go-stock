@@ -1,4 +1,4 @@
-﻿# go-stock macOS 运行指南
+# go-stock macOS 运行指南
 
 本文档说明如何在 macOS 上运行已编译好的 go-stock 二进制程序。
 
