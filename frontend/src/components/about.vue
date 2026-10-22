@@ -2,10 +2,8 @@
 import { MdPreview } from 'md-editor-v3';
 import 'md-editor-v3/lib/preview.css';
 import {h, computed, nextTick, onBeforeUnmount, onMounted, ref} from 'vue';
-import {CheckUpdate, GetConfig, GetVersionInfo,GetEffectiveSponsorVip,GetUserManual,OpenURL,RestartAsAdmin} from "../../wailsjs/go/main/App";
-import {EventsOff, EventsOn,Environment} from "../../wailsjs/runtime";
-import {NAvatar, NButton, NTree, useNotification,NText} from "naive-ui";
-import { zhCN } from 'date-fns/locale';
+import {GetConfig, GetVersionInfo,GetEffectiveSponsorVip,GetUserManual} from "../../wailsjs/go/main/App";
+import {NTree, useNotification} from "naive-ui";
 const updateLog = ref('');
 const versionInfo = ref('');
 const icon = ref('https://raw.githubusercontent.com/CUNLITOU/go-stock/master/build/appicon.png');
@@ -30,71 +28,6 @@ const catalogList = ref([])
 const iframeLoading = ref(true)
 // 支付/赞助页地址：与广场服务同站点，由后端下发的广场地址派生，不写死域名
 const payUrl = ref('')
-
-// 检查更新：后端要在 GitHub API + 代理测速后才能出结果（可能数十秒），
-// 这里点击即给出 loading 反馈，并随 updateCheckStatus 事件更新阶段文案
-const checking = ref(false)
-const checkMessage = ref('正在检查更新...')
-let checkNotification = null
-let checkIdleTimer = null
-// 后端每个阶段都会推 updateCheckStatus，正常间隔不会超过该时长；
-// 超过说明链路异常，兜底关闭 loading 避免一直转圈
-const CHECK_IDLE_TIMEOUT = 60000
-
-const clearCheckIdleTimer = () => {
-  if (checkIdleTimer) {
-    clearTimeout(checkIdleTimer)
-    checkIdleTimer = null
-  }
-}
-
-const closeCheckNotification = () => {
-  clearCheckIdleTimer()
-  if (checkNotification) {
-    checkNotification.destroy()
-    checkNotification = null
-  }
-  checking.value = false
-}
-
-const armCheckIdleTimer = () => {
-  clearCheckIdleTimer()
-  checkIdleTimer = setTimeout(() => {
-    closeCheckNotification()
-    notify.error({
-      title: '检查更新超时',
-      content: () => h('div', {
-        style: {'text-align': 'left', 'font-size': '14px'}
-      }, {default: () => '长时间未收到更新服务器响应，可能是网络受限，请稍后重试或从 GitHub 发布页手动下载。'}),
-      duration: 10000,
-    })
-  }, CHECK_IDLE_TIMEOUT)
-}
-
-const onCheckUpdate = () => {
-  if (checking.value) return
-  closeCheckNotification()
-  checking.value = true
-  checkMessage.value = '正在连接更新服务器...'
-  checkNotification = notify.create({
-    avatar: () => h(NAvatar, {size: 'small', round: false, src: icon.value}),
-    title: '正在检查更新',
-    content: () => h('div', {
-      style: {'text-align': 'left', 'font-size': '14px'}
-    }, {default: () => checkMessage.value}),
-    meta: () => h(NText, {type: 'info'}, {default: () => 'go-stock'}),
-    duration: 0,
-    closable: false,
-  })
-  armCheckIdleTimer()
-  CheckUpdate(1).catch(err => {
-    console.error('CheckUpdate error:', err)
-    if (checking.value) {
-      closeCheckNotification()
-      notify.error({title: '检查更新失败', content: '调用更新接口异常：' + err, duration: 8000})
-    }
-  })
-}
 
 const buildCatalogTree = (headings) => {
   if (!headings.length) return []
@@ -210,132 +143,7 @@ onMounted(() => {
 })
 onBeforeUnmount(() => {
   notify.destroyAll()
-  clearCheckIdleTimer()
-  EventsOff("updateVersion")
-  EventsOff("updateNeedAdmin")
-  EventsOff("updateCheckStatus")
-  EventsOff("updateCheckDone")
-  EventsOff("updateCheckFailed")
 })
-
-EventsOn("updateVersion",async (msg) => {
-  const githubTimeStr = msg.published_at;
-  const utcDate = new Date(githubTimeStr);
-  const date = new Date(utcDate.getTime());
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  const seconds = String(date.getSeconds()).padStart(2, '0');
-
-  const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-
-  notify.info({
-    avatar: () =>
-        h(NAvatar, {
-          size: 'small',
-          round: false,
-          src: icon.value
-        }),
-    title: '发现新版本: ' + msg.tag_name,
-    content: () => {
-      return h('div', {
-        style: {
-          'text-align': 'left',
-          'font-size': '14px',
-        }
-      }, { default: () => msg.commit?.message })
-    },
-    duration: 5000,
-    meta: "发布时间:"+formattedDate,
-    action: () => {
-      return h(NButton, {
-        type: 'primary',
-        size: 'small',
-        onClick: () => {
-          Environment().then(env => {
-            switch (env.platform) {
-              case 'windows':
-                window.open(msg.html_url)
-                break
-              default :
-                OpenURL(msg.html_url)
-                break
-            }
-          })
-        }
-      }, { default: () => '查看' })
-    }
-  })
-})
-
-EventsOn("updateCheckStatus", (msg) => {
-  if (!checking.value) return
-  checkMessage.value = msg?.message || '正在检查更新...'
-  armCheckIdleTimer()
-})
-
-EventsOn("updateCheckDone", () => {
-  // 有新版本时由 App.vue 的 updateDownloadStart 展示下载进度；无更新时由 newsPush 提示
-  closeCheckNotification()
-})
-
-EventsOn("updateCheckFailed", (msg) => {
-  closeCheckNotification()
-  const options = {
-    avatar: () => h(NAvatar, {size: 'small', round: false, src: icon.value}),
-    title: '检查更新失败',
-    content: () => h('div', {
-      style: {
-        'text-align': 'left',
-        'font-size': '14px',
-      }
-    }, {default: () => msg?.message || '无法获取更新信息，请稍后重试。'}),
-    duration: 12000,
-  }
-  if (msg?.releasesUrl) {
-    options.action = () => {
-      return h(NButton, {
-        type: 'primary',
-        size: 'small',
-        onClick: () => window.open(msg.releasesUrl)
-      }, {default: () => '手动下载'})
-    }
-  }
-  notify.error(options)
-})
-
-EventsOn("updateNeedAdmin", (msg) => {
-  notify.warning({
-    avatar: () =>
-        h(NAvatar, {
-          size: 'small',
-          round: false,
-          src: icon.value
-        }),
-    title: '更新需要管理员权限',
-    content: () => {
-      return h('div', {
-        style: {
-          'text-align': 'left',
-          'font-size': '14px',
-        }
-      }, { default: () => '新版本 ' + (msg.version || '') + ' 下载完成，但自动替换文件需要管理员权限。请以管理员身份重启程序后再次检查更新。' })
-    },
-    duration: 15000,
-    action: () => {
-      return h(NButton, {
-        type: 'warning',
-        size: 'small',
-        onClick: () => {
-          RestartAsAdmin()
-        }
-      }, { default: () => '以管理员身份重启' })
-    }
-  })
-})
-
 </script>
 
 <template>
@@ -360,10 +168,6 @@ EventsOn("updateNeedAdmin", (msg) => {
               <template v-else>{{ vipReason || 'VIP 未生效' }}<template v-if="!vipActive && vipStartTime">（生效时间：{{ vipStartTime }}）</template></template>
             </n-gradient-text>
             <n-flex justify="center" :size="12" class="hero-actions">
-              <n-button size="small" @click="onCheckUpdate" :loading="checking" :disabled="checking" type="info" tertiary round>
-                <template #icon>🔄</template>
-                {{ checking ? '检查中...' : '检查更新' }}
-              </n-button>
               <n-button size="small" @click="openManual" type="success" tertiary round>
                 <template #icon>📖</template>
                 查看用户手册

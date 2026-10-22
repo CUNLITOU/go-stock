@@ -28,7 +28,6 @@ import (
 	// 导致 time.LoadLocation("Asia/Shanghai") 失败（loc 为 nil 时 Time.In 会 panic）
 	_ "time/tzdata"
 
-	"github.com/inconshreveable/go-update"
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert/yaml"
 	"golang.org/x/exp/slices"
@@ -44,18 +43,18 @@ import (
 
 // App struct
 type App struct {
-	ctx                context.Context
-	cache              *freecache.Cache
-	cron               *cron.Cron
-	cronEntrys         map[string]cron.EntryID
-	cronEntrysMu       sync.Mutex
-	AiTools            []data.Tool
-	// SponsorInfo 会被定时任务（CheckUpdate）写入、Wails 绑定（GetSponsorInfo）与 isVip 并发读取，
+	ctx          context.Context
+	cache        *freecache.Cache
+	cron         *cron.Cron
+	cronEntrys   map[string]cron.EntryID
+	cronEntrysMu sync.Mutex
+	AiTools      []data.Tool
+	// SponsorInfo 会被 CheckUpdate(首次启动时) 写入、Wails 绑定（GetSponsorInfo）与 isVip 并发读取，
 	// 必须 sponsorMu 保护，否则触发 runtime "concurrent map writes" fatal 直接闪退
-	SponsorInfo        map[string]any
-	sponsorMu          sync.RWMutex
-	VipLevel           int64
-	summaryMu          sync.Mutex
+	SponsorInfo map[string]any
+	sponsorMu   sync.RWMutex
+	VipLevel    int64
+	summaryMu   sync.Mutex
 	// summarySessions 按 eventName 隔离的进行中总结会话（市场总结、悬浮助手等各用各的事件名，
 	// 互不误杀：某一入口的新请求或手动中断只取消自己事件名下的会话）
 	summarySessions    map[string]*summarySession
@@ -319,404 +318,29 @@ func (a *App) CheckSponsorCode(sponsorCode string) map[string]any {
 }
 
 func (a *App) CheckUpdate(flag int) {
-	// 手动检查（flag==1）时向前端持续反馈进度。
-	// GitHub API 与代理测速在国内网络下可能耗时数十秒，若中间状态不推送，
-	// 界面从点击到出结果之间会完全没有响应。
-	manualCheck := flag == 1 && a.ctx != nil
-	emitStatus := func(phase, message string) {
-		if !manualCheck {
-			return
-		}
-		runtime.EventsEmit(a.ctx, "updateCheckStatus", map[string]any{"phase": phase, "message": message})
-	}
-	emitFailed := func(stage, message string) {
-		if !manualCheck {
-			return
-		}
-		runtime.EventsEmit(a.ctx, "updateCheckFailed", map[string]any{
-			"stage":       stage,
-			"message":     message,
-			"releasesUrl": "https://github.com/CUNLITOU/go-stock/releases",
-		})
-	}
-	emitDone := func(hasUpdate bool) {
-		if !manualCheck {
-			return
-		}
-		runtime.EventsEmit(a.ctx, "updateCheckDone", map[string]any{"hasUpdate": hasUpdate})
-	}
-
-	emitStatus("connecting", "正在连接更新服务器...")
-
+	// 自动检查更新功能已彻底移除
+	// 仅保留 VIP 等级判定与资讯同步（VIP2+）
 	sponsorCode := strutil.Trim(a.GetConfig().SponsorCode)
 	if sponsorCode != "" {
 		raw, err := data.SafeDecryptSponsorCode(sponsorCode, BuildKey)
 		if err != nil {
-			logger.SugaredLogger.Errorf("赞助码解密失败: %s", err.Error())
-			emitFailed("sponsor", "赞助码校验失败，无法检查更新。")
+			logger.SugaredLogger.Errorf("sponsor code decrypt failed: %s", err.Error())
 			return
 		}
 		if err = a.setSponsorInfo(raw); err != nil {
 			logger.SugaredLogger.Error(err.Error())
-			emitFailed("sponsor", "赞助码校验失败，无法检查更新。")
 			return
 		}
 	}
 
-	// 定制版本：不检查新版本、不启用自动更新（启动检查/定时检查/手动检查均在此拦截），
-	// 仅保留赞助码解密与 VIP 等级判定（VIP2 及以上仍同步资讯）
-	if CustomBuild {
-		if _, vipLevel, ok := a.isVip(sponsorCode, "", &models.GitHubReleaseVersion{}); ok {
-			level, _ := convertor.ToInt(vipLevel)
-			a.VipLevel = level
-			if level >= 2 {
-				go a.syncNews()
-			}
-		}
-		emitDone(false)
-		return
-	}
-
-	updateChannel := a.GetConfig().UpdateChannel
-	if updateChannel == "" {
-		updateChannel = "release"
-	}
-
-	githubApiHeaders := map[string]string{
-		"Accept":               "application/vnd.github+json",
-		"X-GitHub-Api-Version": "2022-11-28",
-	}
-
-	// 共享客户端超时 300s：GitHub 不可达时手动检查会长时间挂起，必须尽快失败并给出提示
-	apiClient := data.CreateHTTPClientWithTimeout(20 * time.Second)
-
-	releaseVersion := &models.GitHubReleaseVersion{}
-	if updateChannel == "release" {
-		resp, err := apiClient.R().
-			SetHeaders(githubApiHeaders).
-			SetResult(releaseVersion).
-			Get("https://api.github.com/repos/CUNLITOU/go-stock/releases/latest")
-		if err != nil {
-			logger.SugaredLogger.Errorf("get github release version error:%s", err.Error())
-			emitFailed("metadata", "无法连接更新服务器，请检查网络后重试。")
-			return
-		}
-		if resp.StatusCode() != 200 {
-			logger.SugaredLogger.Errorf("get github release version failed, status:%d", resp.StatusCode())
-			emitFailed("metadata", fmt.Sprintf("更新服务器返回异常状态(%d)，请稍后重试。", resp.StatusCode()))
-			return
-		}
-	} else {
-		var releases []models.GitHubReleaseVersion
-		resp, err := apiClient.R().
-			SetHeaders(githubApiHeaders).
-			SetResult(&releases).
-			Get("https://api.github.com/repos/CUNLITOU/go-stock/releases")
-		if err != nil {
-			logger.SugaredLogger.Errorf("get github releases error:%s", err.Error())
-			emitFailed("metadata", "无法连接更新服务器，请检查网络后重试。")
-			return
-		}
-		if resp.StatusCode() != 200 {
-			logger.SugaredLogger.Errorf("get github releases failed, status:%d", resp.StatusCode())
-			emitFailed("metadata", fmt.Sprintf("更新服务器返回异常状态(%d)，请稍后重试。", resp.StatusCode()))
-			return
-		}
-		if len(releases) == 0 {
-			logger.SugaredLogger.Errorf("no releases found")
-			emitFailed("metadata", "未获取到任何发布版本，请稍后重试。")
-			return
-		}
-		if updateChannel == "pre" {
-			for _, r := range releases {
-				if !r.Draft {
-					releaseVersion = &r
-					break
-				}
-			}
-			if releaseVersion.TagName == "" {
-				releaseVersion = &releases[0]
-			}
-		} else {
-			releaseVersion = &releases[0]
-		}
-	}
-
-	if _, vipLevel, ok := a.isVip(sponsorCode, "", releaseVersion); ok {
+	// VIP level check (always returns active VIP2)
+	if _, vipLevel, ok := a.isVip(sponsorCode, "", &models.GitHubReleaseVersion{}); ok {
 		level, _ := convertor.ToInt(vipLevel)
 		a.VipLevel = level
 		if level >= 2 {
 			go a.syncNews()
 		}
 	}
-
-	if releaseVersion.TagName != Version {
-		emitStatus("preparing", "发现新版本 "+releaseVersion.TagName+"，正在准备更新...")
-
-		tag := &models.Tag{}
-		tagResp, tagErr := apiClient.R().
-			SetHeaders(githubApiHeaders).
-			SetResult(tag).
-			Get("https://api.github.com/repos/CUNLITOU/go-stock/git/ref/tags/" + releaseVersion.TagName)
-		if tagErr == nil && tagResp.StatusCode() == 200 && tag.Object.Url != "" {
-			releaseVersion.Tag = *tag
-			commit := &models.Commit{}
-			commitResp, commitErr := apiClient.R().
-				SetHeaders(githubApiHeaders).
-				SetResult(commit).
-				Get(tag.Object.Url)
-			if commitErr == nil && commitResp.StatusCode() == 200 {
-				releaseVersion.Commit = *commit
-			}
-		}
-
-		commitMessage := releaseVersion.Body
-		if releaseVersion.Commit.Message != "" {
-			commitMessage = releaseVersion.Commit.Message
-		}
-
-		downloadUrl := ""
-		assetName := ""
-		if IsWindows() {
-			if IsArm64() {
-				assetName = "go-stock-windows-arm64.exe"
-			} else {
-				assetName = "go-stock-windows-amd64.exe"
-			}
-		} else if IsMacOS() {
-			// macOS 下载 .app bundle 完整包（含 Info.plist/资源/签名），整体替换生效；
-			// 裸二进制替换会破坏代码签名且在 App Translocation/DMG 场景必然失败
-			assetName = "go-stock-darwin-universal.zip"
-		} else if IsLinux() {
-			if IsArm64() {
-				assetName = "go-stock-linux-arm64"
-			} else {
-				assetName = "go-stock-linux-amd64"
-			}
-		}
-
-		assetFound := false
-		for _, asset := range releaseVersion.Assets {
-			if asset.Name == assetName {
-				downloadUrl = asset.BrowserDownloadUrl
-				assetFound = true
-				break
-			}
-		}
-
-		if downloadUrl == "" {
-			downloadUrl = fmt.Sprintf("https://github.com/CUNLITOU/go-stock/releases/download/%s/%s", releaseVersion.TagName, assetName)
-		}
-
-		// 当前平台的安装包未包含在该 Release 中（如历史版本未发布 Linux 资产）时，
-		// 所有下载源必然 404，直接失败并引导手动下载，避免无谓的测速与重试。
-		// 赞助码用户可能配置了自定义 CDN 地址（winDownUrl 等），不在此拦截。
-		if !assetFound && sponsorCode == "" {
-			logger.SugaredLogger.Errorf("release %s 中未找到当前平台的安装包: %s", releaseVersion.TagName, assetName)
-			emitDone(true)
-			go runtime.EventsEmit(a.ctx, "updateDownloadFailed", map[string]any{
-				"downloadId": fmt.Sprintf("update-%d", time.Now().UnixNano()),
-				"version":    releaseVersion.TagName,
-				"error":      "该版本未发布当前平台的安装包，请前往发布页手动下载。",
-				"manualLinks": map[string]any{
-					"mirror":   "https://gh.927223.xyz/" + downloadUrl,
-					"original": downloadUrl,
-				},
-			})
-			return
-		}
-
-		originalDownloadUrl := downloadUrl
-		downloadUrl, _, _ = a.isVip(sponsorCode, downloadUrl, releaseVersion)
-		mirrorDownloadUrl := "https://gh.927223.xyz/" + originalDownloadUrl
-		manualDownloadTip := fmt.Sprintf("\n手动下载链接(加速镜像): %s\n手动下载链接(原始地址): %s\n下载后请替换当前程序文件即可完成更新。", mirrorDownloadUrl, originalDownloadUrl)
-
-		var totalSize int64
-		for _, asset := range releaseVersion.Assets {
-			if asset.Name == assetName {
-				totalSize = int64(asset.Size)
-				break
-			}
-		}
-
-		useProxy := data.IsGitHubURL(originalDownloadUrl)
-		var bestProxy string
-		var proxySpeed float64
-		if useProxy {
-			emitStatus("speedtest", "正在测速选择最快的下载通道，可能需要几秒钟...")
-			bestProxy, proxySpeed = data.SelectFastestProxy(a.ctx, originalDownloadUrl)
-		}
-
-		type downloadSource struct{ url, proxy string }
-		var sources []downloadSource
-		if bestProxy != "" && useProxy {
-			sources = append(sources, downloadSource{data.ProxyDownloadURL(originalDownloadUrl, bestProxy), bestProxy})
-		}
-		sources = append(sources, downloadSource{downloadUrl, ""})
-		if downloadUrl != originalDownloadUrl {
-			sources = append(sources, downloadSource{originalDownloadUrl, ""})
-		}
-		sources = append(sources, downloadSource{mirrorDownloadUrl, "gh.927223.xyz"})
-
-		emitDone(true)
-
-		downloadID := fmt.Sprintf("update-%d", time.Now().UnixNano())
-		go runtime.EventsEmit(a.ctx, "updateDownloadStart", map[string]any{
-			"downloadId": downloadID,
-			"version":    releaseVersion.TagName,
-			"total":      totalSize,
-			"proxy":      bestProxy,
-			"proxySpeed": proxySpeed,
-			"message":    commitMessage,
-			"useProxy":   useProxy,
-		})
-
-		tmpFile, err := os.CreateTemp("", "go-stock-update-*.tmp")
-		if err != nil {
-			logger.SugaredLogger.Errorf("create temp file error: %s", err.Error())
-			go runtime.EventsEmit(a.ctx, "updateDownloadFailed", map[string]any{
-				"downloadId": downloadID,
-				"version":    releaseVersion.TagName,
-				"error":      "无法创建临时文件: " + err.Error(),
-				"manualLinks": map[string]any{
-					"mirror":   mirrorDownloadUrl,
-					"original": originalDownloadUrl,
-				},
-			})
-			return
-		}
-		tmpPath := tmpFile.Name()
-		tmpFile.Close()
-		defer os.Remove(tmpPath)
-
-		var downloadSuccess bool
-		for i, src := range sources {
-			err := a.downloadUpdate(src.url, tmpPath, totalSize, downloadID, src.proxy)
-			if err != nil {
-				logger.SugaredLogger.Warnf("download from %s error: %s, trying next...", src.url, err.Error())
-				go runtime.EventsEmit(a.ctx, "downloadProgress", map[string]any{
-					"downloadId":    downloadID,
-					"status":        "retrying",
-					"attempt":       i + 1,
-					"totalAttempts": len(sources),
-					"proxy":         src.proxy,
-				})
-				continue
-			}
-			fileInfo, statErr := os.Stat(tmpPath)
-			if statErr != nil || fileInfo.Size() < 1024*500 {
-				logger.SugaredLogger.Warnf("download from %s file size invalid, trying next...", src.url)
-				continue
-			}
-			downloadSuccess = true
-			break
-		}
-
-		if !downloadSuccess {
-			go runtime.EventsEmit(a.ctx, "updateDownloadFailed", map[string]any{
-				"downloadId": downloadID,
-				"version":    releaseVersion.TagName,
-				"error":      "所有下载源均失败",
-				"manualLinks": map[string]any{
-					"mirror":   mirrorDownloadUrl,
-					"original": originalDownloadUrl,
-				},
-			})
-			return
-		}
-
-		go runtime.EventsEmit(a.ctx, "updateDownloadComplete", map[string]any{
-			"downloadId": downloadID,
-			"version":    releaseVersion.TagName,
-		})
-
-		// macOS：解压 .app bundle 并整体替换（见 update_helper_darwin.go），
-		// 成功后下次打开应用即为新版本，不强制重启
-		if IsMacOS() {
-			if err := ApplyMacUpdate(tmpPath); err != nil {
-				logger.SugaredLogger.Error("macOS 更新失败: ", err.Error())
-				go runtime.EventsEmit(a.ctx, "updateDownloadFailed", map[string]any{
-					"downloadId": downloadID,
-					"version":    releaseVersion.TagName,
-					"error":      err.Error(),
-					"manualLinks": map[string]any{
-						"mirror":   mirrorDownloadUrl,
-						"original": originalDownloadUrl,
-					},
-				})
-				return
-			}
-			go runtime.EventsEmit(a.ctx, "newsPush", map[string]any{
-				"time":    "新版本：" + releaseVersion.TagName,
-				"isRed":   true,
-				"source":  "go-stock",
-				"content": "版本更新完成，重启应用后生效（直接退出并重新打开 go-stock 即可）。",
-			})
-			return
-		}
-
-		body, err := os.ReadFile(tmpPath)
-		if err != nil {
-			logger.SugaredLogger.Errorf("read downloaded file error: %s", err.Error())
-			go runtime.EventsEmit(a.ctx, "newsPush", map[string]any{
-				"time":    "新版本：" + releaseVersion.TagName,
-				"isRed":   true,
-				"source":  "go-stock",
-				"content": commitMessage + "\n新版本下载失败(无法读取临时文件)。" + manualDownloadTip,
-			})
-			return
-		}
-
-		err = update.Apply(bytes.NewReader(body), update.Options{})
-		if err != nil {
-			logger.SugaredLogger.Error("更新失败: ", err.Error())
-			if !IsRunningAsAdmin() {
-				go runtime.EventsEmit(a.ctx, "updateNeedAdmin", map[string]any{
-					"version": releaseVersion.TagName,
-					"message": commitMessage,
-				})
-			} else {
-				go runtime.EventsEmit(a.ctx, "updateVersion", releaseVersion)
-			}
-			return
-		} else {
-			go runtime.EventsEmit(a.ctx, "newsPush", map[string]any{
-				"time":    "新版本：" + releaseVersion.TagName,
-				"isRed":   true,
-				"source":  "go-stock",
-				"content": "版本更新完成,下次重启软件生效.",
-			})
-		}
-	} else {
-		emitDone(false)
-		if flag == 1 {
-			go runtime.EventsEmit(a.ctx, "newsPush", map[string]any{
-				"time":    "当前版本：" + Version,
-				"isRed":   true,
-				"source":  "go-stock",
-				"content": "当前版本无更新",
-			})
-		}
-
-	}
-
-}
-
-// downloadUpdate 包装 data.DownloadWithProgress，通过 Wails 事件发射下载进度。
-func (a *App) downloadUpdate(url string, tmpPath string, totalSize int64, downloadID string, proxy string) error {
-	return data.DownloadWithProgress(a.ctx, url, tmpPath, totalSize,
-		func(downloaded, total int64, percentage, currentSpeed, avgSpeed float64) {
-			go runtime.EventsEmit(a.ctx, "downloadProgress", map[string]any{
-				"downloadId": downloadID,
-				"downloaded": downloaded,
-				"total":      total,
-				"percentage": percentage,
-				"speed":      currentSpeed,
-				"avgSpeed":   avgSpeed,
-				"proxy":      proxy,
-				"status":     "downloading",
-			})
-		})
 }
 
 func (a *App) isVip(sponsorCode string, downloadUrl string, releaseVersion *models.GitHubReleaseVersion) (string, string, bool) {
@@ -1119,19 +743,13 @@ func (a *App) domReady(ctx context.Context) {
 			a.setCronEntry("StockTransactionCacheClean", idTxClean)
 		}
 	}()
-	//检查新版本
+	//启动后初始化数据同步（已移除自动检查更新功能）
 	go func() {
-		a.CheckUpdate(0)
 		go a.CheckStockBaseInfo(a.ctx)
 		go syncAllStockInfo(a.ctx)
 
 		a.cron.AddFunc("0 0 2 * * *", func() {
-			logger.SugaredLogger.Errorf("Checking for updates...")
 			a.CheckStockBaseInfo(a.ctx)
-		})
-		a.cron.AddFunc("30 05 8,12,20 * * *", func() {
-			logger.SugaredLogger.Errorf("Checking for updates...")
-			a.CheckUpdate(0)
 		})
 		a.cron.AddFunc("30 05 8,12,20 * * *", func() {
 			syncAllStockInfo(a.ctx)

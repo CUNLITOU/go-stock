@@ -56,8 +56,6 @@ type Settings struct {
 	RefreshInterval        int64  `json:"refreshInterval"`
 	OpenAiEnable           bool   `json:"openAiEnable"`
 	Prompt                 string `json:"prompt"`
-	CheckUpdate            bool   `json:"checkUpdate"`
-	UpdateChannel          string `json:"updateChannel"`
 	QuestionTemplate       string `json:"questionTemplate"`
 	CrawlTimeOut           int64  `json:"crawlTimeOut"`
 	KDays                  int64  `json:"kDays"`
@@ -330,8 +328,6 @@ func UpdateConfig(s *SettingConfig) string {
 			"open_ai_enable":                s.OpenAiEnable,
 			"tushare_token":                 s.TushareToken,
 			"prompt":                        s.Prompt,
-			"check_update":                  s.CheckUpdate,
-			"update_channel":                s.UpdateChannel,
 			"question_template":             s.QuestionTemplate,
 			"crawl_time_out":                s.CrawlTimeOut,
 			"k_days":                        s.KDays,
